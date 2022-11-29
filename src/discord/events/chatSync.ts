@@ -50,22 +50,28 @@ export class chatSync {
       }
       foundChannel.lastMessage = Date.now();
       this.guildConfig.save(config);
+      let channel: BaseGuildTextChannel
       (await this.guildConfig.getAllChannels()).map(async (x) => {
         if (x.banned) return;
 
         if (x.channels && x.guild !== message.guildId) {
-          var channel = (bot.channels.cache.find(
+          var found = Object.entries(x.channels).find(
+            ([key, value]) => value.category === foundChannel.category
+          )
+          try{
+            
+          channel = (bot.channels.cache.find(
             (channel) =>
-              channel.id ===
-              Object.entries(x.channels).find(
-                ([key, value]) => value.category === foundChannel.category
-              )?.[1].channel
+              channel.id === found?.[0]
           ) ||
             (await bot.channels.fetch(
-              Object.entries(x.channels).find(
-                ([key, value]) => value.category === foundChannel.category
-              )?.[1].channel || ""
+              found?.[0] || ""
             ))) as BaseGuildTextChannel;
+
+          }catch{() => {
+
+          }}
+
           if (!channel) return;
           var webhook =
             (await channel.fetchWebhooks()).find(
