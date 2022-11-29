@@ -70,7 +70,7 @@ export class chatSync {
               console.log(exc);
             };
           }
-
+          console.log(channel)
           if (!channel) return;
           try {
             var webhook =
