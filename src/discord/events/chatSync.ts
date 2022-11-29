@@ -50,67 +50,66 @@ export class chatSync {
       }
       foundChannel.lastMessage = Date.now();
       this.guildConfig.save(config);
-      let channel: BaseGuildTextChannel
+      let channel: BaseGuildTextChannel;
       (await this.guildConfig.getAllChannels()).map(async (x) => {
         if (x.banned) return;
 
         if (x.channels && x.guild !== message.guildId) {
           var found = Object.entries(x.channels).find(
             ([key, value]) => value.category === foundChannel.category
-          )
-          try{
-            
-          channel = (bot.channels.cache.find(
-            (channel) =>
-              channel.id === found?.[0]
-          ) ||
-            (await bot.channels.fetch(
-              found?.[0] || ""
-            ))) as BaseGuildTextChannel;
-
-          }catch{() => {
-
-          }}
+          );
+          try {
+            channel = (bot.channels.cache.find(
+              (channel) => channel.id === found?.[0]
+            ) ||
+              (await bot.channels.fetch(
+                found?.[0] || ""
+              ))) as BaseGuildTextChannel;
+          } catch {
+            (exc: any) => {
+              console.log(exc);
+            };
+          }
 
           if (!channel) return;
-          try{
+          try {
+            var webhook =
+              (await channel.fetchWebhooks()).find(
+                (x) => x.owner?.id === bot.user?.id
+              ) ||
+              (await channel.createWebhook({
+                name: "Chat Sync",
+                reason: "No Webhook was available",
+              }));
+            const guildBtn = new ButtonBuilder()
+              .setLabel("From: " + message.guildId)
+              .setEmoji("👋")
+              .setStyle(ButtonStyle.Secondary)
+              .setCustomId("from-btn")
+              .setDisabled(true);
 
-        
-          var webhook =
-            (await channel.fetchWebhooks()).find(
-              (x) => x.owner?.id === bot.user?.id
-            ) ||
-            (await channel.createWebhook({
-              name: "Chat Sync",
-              reason: "No Webhook was available",
-            }));
-          const guildBtn = new ButtonBuilder()
-            .setLabel("From: " + message.guildId)
-            .setEmoji("👋")
-            .setStyle(ButtonStyle.Secondary)
-            .setCustomId("from-btn")
-            .setDisabled(true);
-
-          const row =
-            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              guildBtn
-            );
-          await webhook.send({
-            avatarURL: message.author.avatarURL() || undefined,
-            content: message.content,
-            username:
-              message.author.username + " ( " + message.author.id + " )",
-            components: [row],
-            allowedMentions: {
-              repliedUser: false,
-              parse: [],
-              roles: [],
-              users: [],
-            },
-          });
-        }catch{() => {
-          console.log("Couldnt Create a Webhook")
-        }}
+            const row =
+              new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                guildBtn
+              );
+            await webhook.send({
+              avatarURL: message.author.avatarURL() || undefined,
+              content: message.content,
+              username:
+                message.author.username + " ( " + message.author.id + " )",
+              components: [row],
+              allowedMentions: {
+                repliedUser: false,
+                parse: [],
+                roles: [],
+                users: [],
+              },
+            });
+          } catch {
+            () => {
+              console.log("Couldnt Create a Webhook");
+            };
+          }
         }
       });
     }
