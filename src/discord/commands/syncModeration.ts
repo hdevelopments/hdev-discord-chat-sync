@@ -166,6 +166,7 @@ class syncModeration {
 
     var data = await this.guildConfigService.getOrCreate(interaction.guildId!);
     var setupData = this.setupData[interaction.message.id].channel;
+    if (!data.channels) data.channels = {};
     data.channels[setupData] = {
       category: category,
       channel: setupData,

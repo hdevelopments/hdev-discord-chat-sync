@@ -13,7 +13,6 @@ import {
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
-Webhook;
 @Discord()
 export class chatSync {
   @Inject()
@@ -36,7 +35,7 @@ export class chatSync {
       return;
     }
     var config = await this.guildConfig.getOrCreate(message.guildId!);
-    if (config.banned) return;
+    if (config.banned || !config.channels) return;
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
       if (Date.now() - (foundChannel.lastMessage || 0) < 1000) {
@@ -51,8 +50,8 @@ export class chatSync {
       }
       foundChannel.lastMessage = Date.now();
       this.guildConfig.save(config);
-      let channel: BaseGuildTextChannel;
       (await this.guildConfig.getAllChannels()).map(async (x) => {
+        let channel: BaseGuildTextChannel;
         if (x.banned) return;
 
         if (x.channels && x.guild !== message.guildId) {
@@ -69,6 +68,9 @@ export class chatSync {
           } catch (exc: any) {
             console.log("Channel Error:");
             console.log(exc);
+            delete x.channels[found?.[0]!];
+            await this.guildConfig.save(x);
+            return;
           }
           if (!channel) return;
           const guildBtn = new ButtonBuilder()
