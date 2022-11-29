@@ -73,6 +73,9 @@ export class chatSync {
           }}
 
           if (!channel) return;
+          try{
+
+        
           var webhook =
             (await channel.fetchWebhooks()).find(
               (x) => x.owner?.id === bot.user?.id
@@ -105,6 +108,9 @@ export class chatSync {
               users: [],
             },
           });
+        }catch{() => {
+          console.log("Couldnt Create a Webhook")
+        }}
         }
       });
     }
