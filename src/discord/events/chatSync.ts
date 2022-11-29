@@ -9,10 +9,11 @@ import {
   MessageActionRowComponentBuilder,
   MessageType,
   TextBasedChannel,
+  Webhook,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
-
+Webhook;
 @Discord()
 export class chatSync {
   @Inject()
@@ -65,13 +66,17 @@ export class chatSync {
               (await bot.channels.fetch(
                 found?.[0] || ""
               ))) as BaseGuildTextChannel;
-          } catch {
-            (exc: any) => {
-              console.log(exc);
-            };
+          } catch (exc: any) {
+            console.log(exc);
           }
-          console.log(channel)
           if (!channel) return;
+          const guildBtn = new ButtonBuilder()
+            .setLabel("From: " + message.guildId)
+            .setEmoji("👋")
+            .setStyle(ButtonStyle.Secondary)
+            .setCustomId("from-btn")
+            .setDisabled(true);
+
           try {
             var webhook =
               (await channel.fetchWebhooks()).find(
@@ -81,17 +86,13 @@ export class chatSync {
                 name: "Chat Sync",
                 reason: "No Webhook was available",
               }));
-            const guildBtn = new ButtonBuilder()
-              .setLabel("From: " + message.guildId)
-              .setEmoji("👋")
-              .setStyle(ButtonStyle.Secondary)
-              .setCustomId("from-btn")
-              .setDisabled(true);
+            console.log(webhook);
 
             const row =
               new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 guildBtn
               );
+
             await webhook.send({
               avatarURL: message.author.avatarURL() || undefined,
               content: message.content,
@@ -105,10 +106,15 @@ export class chatSync {
                 users: [],
               },
             });
-          } catch {
-            () => {
-              console.log("Couldnt Create a Webhook");
-            };
+          } catch (exc: any) {
+            console.log(exc);
+            channel.send(
+              message.member?.displayName +
+                "(" +
+                message.member?.id +
+                "):" +
+                message.content
+            );
           }
         }
       });
