@@ -28,7 +28,6 @@ import { noDms } from "../guards/noDms";
   dmPermission: false,
   defaultMemberPermissions: ["ManageChannels", "ManageMessages"],
 })
-@SlashGroup("moderation")
 @Guard(noDms)
 class syncModeration {
   @Inject()
@@ -37,6 +36,7 @@ class syncModeration {
   private setupData: { [key: string]: { channel: string } } = {};
 
   @Slash({ description: "Set the channel for chatting." })
+  @SlashGroup("moderation")
   async setchatchannel(
     @SlashOption({
       type: ApplicationCommandOptionType.Channel,
