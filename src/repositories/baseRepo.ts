@@ -89,7 +89,6 @@ export default class baseRepo<T extends BaseModel> {
   async save(data: T) {
     await this.ready;
     var found = await this.getOneById(data._id);
-    console.log(data);
     if (!found) {
       return await this.repository.insert(data);
     } else {
