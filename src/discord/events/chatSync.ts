@@ -67,6 +67,7 @@ export class chatSync {
                 found?.[0] || ""
               ))) as BaseGuildTextChannel;
           } catch (exc: any) {
+            console.log("Channel Error:");
             console.log(exc);
           }
           if (!channel) return;
@@ -107,6 +108,7 @@ export class chatSync {
               },
             });
           } catch (exc: any) {
+            console.log("WEBHOOK Error:");
             console.log(exc);
             channel.send(
               message.member?.displayName +
