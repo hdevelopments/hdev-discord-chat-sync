@@ -148,6 +148,7 @@ class syncModeration {
       category,
       interaction.member?.user!
     );
+ 
     await this.guildConfigService.removeCategory(found);
     await interaction.editReply("Category successfully removed!");
   }

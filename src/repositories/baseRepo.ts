@@ -36,9 +36,11 @@ export default class baseRepo<T extends BaseModel> {
     return await this.repository.findOne(id);
   }
 
-  async filterMany(key: keyof T, filter: (query: QueryOperator<T>) => void) {
+  async filterMany(key: keyof T | any, filter: (query: QueryOperator<T | any>) => void, wType?: boolean) {
     await this.ready;
-    return await this.repository.query().filter(key, filter).findMany();
+    if(wType)
+      return await this.repository.query( {weakType: true} ).filter(key, filter).findMany();
+    return await this.repository.query( {weakType: false} ).filter(key, filter).findMany();
   }
 
   async filterOne(key: keyof T, filter: (query: QueryOperator<T>) => void) {

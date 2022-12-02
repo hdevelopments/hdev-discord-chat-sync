@@ -1,15 +1,13 @@
-import { ArgsOf, Discord, On } from "discordx";
+import { ArgsOf, ButtonComponent, Discord, ModalComponent, On } from "discordx";
 import { Inject } from "typedi";
 import {
   ActionRowBuilder,
   BaseGuildTextChannel,
-  ButtonBuilder,
-  ButtonStyle,
-  InteractionResponseType,
-  MessageActionRowComponentBuilder,
+  ButtonInteraction,
   MessageType,
-  TextBasedChannel,
-  Webhook,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
@@ -55,5 +53,95 @@ export class chatSync {
       foundChannel.lastMessage = Date.now();
       this.guildConfig.save(config);
     }
+  }
+
+  @ButtonComponent({ id: /details-(\d+)-(\d+)/ })
+  async doDetails(interaction: ButtonInteraction) {
+    console.log(interaction);
+    var data = interaction.customId.split("-");
+
+    var channelId = data[1];
+    var messageId = data[2];
+
+    var modal = new ModalBuilder()
+      .setTitle("Details about a message")
+      .setCustomId("details-dummy");
+
+    try {
+      var channel = (bot.channels.cache.find((x) => x.id === channelId) ||
+        (await bot.channels.fetch(channelId))) as BaseGuildTextChannel;
+      var message =
+        channel?.messages.cache.find((x) => x.id === messageId) ||
+        (await channel.messages.fetch(messageId));
+
+      const guildComponent = new TextInputBuilder()
+        .setCustomId("guild-details")
+        .setLabel("Guild:")
+        .setStyle(TextInputStyle.Short)
+        .setValue(channel.guild.name + " | " + channel.guildId)
+        .setRequired(false);
+      const row0 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        guildComponent
+      );
+
+      const channelComponent = new TextInputBuilder()
+        .setCustomId("channel-details")
+        .setLabel("Channel:")
+        .setStyle(TextInputStyle.Short)
+        .setValue(channel.name + " | " + channelId)
+        .setRequired(false);
+      const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        channelComponent
+      );
+
+      const messageComponent = new TextInputBuilder()
+        .setCustomId("message-details")
+        .setLabel("User:")
+        .setStyle(TextInputStyle.Short)
+        .setValue(message.author.username + " | " + message.author.id)
+        .setRequired(false);
+      const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        messageComponent
+      );
+
+      const inviteComponent = new TextInputBuilder()
+        .setCustomId("invite-details")
+        .setLabel("Invite:")
+        .setStyle(TextInputStyle.Short)
+        .setValue("Not Allowed!")
+        .setRequired(false);
+      try {
+        inviteComponent.setValue(
+          message.guild.invites.cache.find((x) => x.inviterId === bot.user?.id)
+            ?.url || (await message.guild.invites.create(message.channelId)).url
+        );
+      } catch (exc: any) {
+        // Ignore
+      }
+      const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        inviteComponent
+      );
+
+      modal.addComponents(row0, row1, row2, row3);
+      interaction.showModal(modal);
+    } catch (exc: any) {
+      // Create text input fields
+      const errorComponent = new TextInputBuilder()
+        .setCustomId("error")
+        .setLabel("Message")
+        .setStyle(TextInputStyle.Short)
+        .setValue("An error occured! (Guild / Channel is not existing anymore?)")
+        .setRequired(false);
+      const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        errorComponent
+      );
+      modal.addComponents(row1);
+      interaction.showModal(modal);
+    }
+  }
+  @ModalComponent({ id: "details-dummy" })
+  async dummy(interaction: ButtonInteraction) {
+    interaction.deferReply();
+    interaction.deleteReply();
   }
 }

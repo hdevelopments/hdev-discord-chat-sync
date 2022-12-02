@@ -61,9 +61,7 @@ bot.on("interactionCreate", (interaction: Interaction) => {
   try {
     bot.executeInteraction(interaction);
   } catch (exc) {
-    {
       console.log(exc);
-    }
   }
 });
 
@@ -71,9 +69,7 @@ bot.on("messageCreate", (message: Message) => {
   try {
     bot.executeCommand(message);
   } catch (exc) {
-    {
       console.log(exc);
-    }
   }
 });
 

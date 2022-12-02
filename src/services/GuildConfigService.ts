@@ -1,4 +1,5 @@
 import { APIUser, User } from "discord.js";
+import { ObjectID } from "ts-mongodb-orm";
 import { Inject, Service } from "typedi";
 import guildCategory from "../models/db-models/GuildCategoryModel";
 import guildConfig from "../models/db-models/GuildConfigModel";
@@ -41,7 +42,9 @@ class GuildConfigService {
 
     return await this.GuildCategoryRepo.save(created);
   }
-
+  async findCategory(categoryId: ObjectID) {
+    return await this.GuildCategoryRepo.getOneById(categoryId);
+  }
   async save(guildConfig: guildConfig) {
     return await this.GuildConfigRepo.save(guildConfig);
   }
@@ -60,6 +63,10 @@ class GuildConfigService {
 
   async getAllCategories() {
     return await this.GuildCategoryRepo.filterMany("_id", (x) => x.exists());
+  }
+
+  async changeAllChannelsFromTo(oldCategory: string, newCategory: string){
+    console.log(await this.GuildConfigRepo.filterMany("channels.$all", x => x.exists(true), true))
   }
 }
 

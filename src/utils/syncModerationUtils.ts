@@ -2,11 +2,14 @@ import {
   ActionRowBuilder,
   BaseGuildTextChannel,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   Message,
   MessageActionRowComponentBuilder,
   Webhook,
 } from "discord.js";
+import { ButtonComponent } from "discordx";
+import { ObjectID } from "ts-mongodb-orm";
 import { Inject, Service } from "typedi";
 import bot from "../main";
 import GuildConfigService from "../services/GuildConfigService";
@@ -16,6 +19,9 @@ export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
   async sendToAllChannels(category: string, message: Message) {
+    var foundCategory = await this.GuildConfig.findCategory(new ObjectID(category))
+    console.log(category)
+    console.log(foundCategory)
     var allGuilds = (await this.GuildConfig.getAllChannels())
       .filter((x) => !x.banned)
       .flatMap((x) =>
@@ -25,15 +31,19 @@ export default class syncUtils {
       );
 
     const guildBtn = new ButtonBuilder()
-      .setLabel("From: " + message.guildId)
+      .setLabel("Details")
       .setEmoji("👋")
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId("from-btn")
+      .setCustomId("details-" + message.channelId + "-" + message.id);
+    const categoryBtn = new ButtonBuilder()
+      .setLabel(foundCategory?.name || "No Category")
+      .setStyle(ButtonStyle.Secondary)
+      .setCustomId("details-category")
       .setDisabled(true);
-
     const row =
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        guildBtn
+        guildBtn,
+        categoryBtn
       );
     allGuilds.forEach(async (x) => {
       if (!x.channel || x.channel === message.channelId) return;
