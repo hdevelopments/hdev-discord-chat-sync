@@ -57,7 +57,6 @@ export class chatSync {
 
   @ButtonComponent({ id: /details-(\d+)-(\d+)/ })
   async doDetails(interaction: ButtonInteraction) {
-    console.log(interaction);
     var data = interaction.customId.split("-");
 
     var channelId = data[1];

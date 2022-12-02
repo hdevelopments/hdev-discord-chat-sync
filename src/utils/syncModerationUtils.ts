@@ -20,8 +20,6 @@ export default class syncUtils {
   private GuildConfig: GuildConfigService;
   async sendToAllChannels(category: string, message: Message) {
     var foundCategory = await this.GuildConfig.findCategory(new ObjectID(category))
-    console.log(category)
-    console.log(foundCategory)
     var allGuilds = (await this.GuildConfig.getAllChannels())
       .filter((x) => !x.banned)
       .flatMap((x) =>
