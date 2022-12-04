@@ -19,3 +19,4 @@ Put your credentials in it and run npm run dev or npm run start ( depending on w
 # Other Stuff:
 
  [![Bots for Discord](https://discords.com/bots/api/bot/1046756800260735058/widget)](https://discords.com/bots/bots/1046756800260735058)
+ [![Discord Bots](https://top.gg/api/widget/1046756800260735058.svg)(https://top.gg/bot/1046756800260735058)
