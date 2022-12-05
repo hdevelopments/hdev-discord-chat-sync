@@ -42,9 +42,15 @@ class GuildConfigService {
 
     return await this.GuildCategoryRepo.save(created);
   }
+
+  async getByChannel(guild: string, channel: string) {
+    return (await this.GuildConfigRepo.filterOne("guild", x => x.exists()))?.channels[channel];
+  }
+
   async findCategory(categoryId: ObjectID) {
     return await this.GuildCategoryRepo.getOneById(categoryId);
   }
+
   async save(guildConfig: guildConfig) {
     return await this.GuildConfigRepo.save(guildConfig);
   }
@@ -54,6 +60,20 @@ class GuildConfigService {
   }
 
   async removeCategory(category: guildCategory) {
+    var channels = await this.getAllChannels()
+    channels.forEach(async guilds => {
+      let changed = false
+      Object.entries(guilds.channels).forEach(async channels =>{
+        if(channels[1].category === category._id.toString()){
+          changed = true
+          delete guilds.channels[channels[0]]
+        }
+        if(changed){
+          await this.GuildConfigRepo.save(guilds)
+        }
+      })
+
+    })
     return await this.GuildCategoryRepo.removeOne(category);
   }
 

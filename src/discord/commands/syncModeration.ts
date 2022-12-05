@@ -17,6 +17,7 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
+import { ObjectID } from "ts-mongodb-orm";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
@@ -148,7 +149,7 @@ class syncModeration {
       category,
       interaction.member?.user!
     );
- 
+    
     await this.guildConfigService.removeCategory(found);
     await interaction.editReply("Category successfully removed!");
   }
@@ -178,5 +179,29 @@ class syncModeration {
 
     await interaction.editReply("Success!");
     return;
+  }
+
+  @Slash({
+    description: "Shows you the information about this Channel.",
+  })
+  @SlashGroup("moderation")
+  async info(interaction: CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+    var found = await this.guildConfigService.getByChannel(
+      interaction.guildId!,
+      interaction.channelId
+    );
+    var category = await this.guildConfigService.findCategory(new ObjectID(found?.category))
+   
+    if (category) {
+      var embed = new EmbedBuilder().setTitle("Information");
+      embed.addFields(
+        { name: "Category:", value: category.name },
+        { name: "NSFW:", value: String(category.nsfw) }
+      );
+      await interaction.editReply({ embeds: [embed] });
+    }else{
+      await interaction.editReply("This isnt a Chat Sync chat!");
+    }
   }
 }

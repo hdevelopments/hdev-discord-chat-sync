@@ -4,11 +4,11 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  EmbedBuilder,
+  hyperlink,
   Message,
   MessageActionRowComponentBuilder,
-  Webhook,
 } from "discord.js";
-import { ButtonComponent } from "discordx";
 import { ObjectID } from "ts-mongodb-orm";
 import { Inject, Service } from "typedi";
 import bot from "../main";
@@ -19,7 +19,9 @@ export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
   async sendToAllChannels(category: string, message: Message) {
-    var foundCategory = await this.GuildConfig.findCategory(new ObjectID(category))
+    var foundCategory = await this.GuildConfig.findCategory(
+      new ObjectID(category)
+    );
     var allGuilds = (await this.GuildConfig.getAllChannels())
       .filter((x) => !x.banned)
       .flatMap((x) =>
@@ -43,6 +45,48 @@ export default class syncUtils {
         guildBtn,
         categoryBtn
       );
+
+    var embed = new EmbedBuilder();
+
+    embed.setAuthor({
+      name: message.author.username,
+      iconURL: message.author.avatarURL() || undefined,
+    });
+    embed.setTimestamp(Date.now());
+    embed.setColor("Blue");
+    var isInBotCache = false;
+    var text = message.content;
+    var animatedemojis = message.content.matchAll(/<a:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm);
+    var emojis = message.content.matchAll(/<:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm);
+    console.log(text);
+
+
+    for (let n of emojis) {
+      console.log(n);
+      let url = hyperlink(
+        n[0],
+        "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
+        "The custom Emote"
+      );
+      text = text.replaceAll(n[0], url);
+      console.log(text);
+      if (bot.emojis.cache.get(n[1])) {
+        isInBotCache = true;
+      }
+    }
+    for (let n of animatedemojis) {
+      console.log(n);
+      let url = hyperlink(
+        n[0],
+        "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
+        "The custom Emote"
+      );
+      text = text.replaceAll(n[0], url);
+      console.log(text);
+      if (bot.emojis.cache.get(n[1])) {
+        isInBotCache = true;
+      }
+    }
     allGuilds.forEach(async (x) => {
       if (!x.channel || x.channel === message.channelId) return;
 
@@ -52,23 +96,20 @@ export default class syncUtils {
         ) || (await bot.channels.fetch(x.channel))) as BaseGuildTextChannel;
 
         if (!channel) return;
-        let webhook: Webhook;
 
         try {
-          webhook =
-            (await channel.fetchWebhooks()).find(
-              (x) => x.owner?.id === bot.user?.id
-            ) ||
-            (await channel.createWebhook({
-              name: "Chat Sync",
-              reason: "No Webhook was available",
-            }));
+          if (isInBotCache) {
+            const customemojis = new ButtonBuilder()
+              .setLabel("To see some of the custom Emojis you need to be in the guild!")
+              .setStyle(ButtonStyle.Primary)
+              .setCustomId("details-customemojis")
+              .setDisabled(true);
+            row.addComponents(customemojis);
+          }
+          embed.setDescription(text);
 
-          await webhook.send({
-            avatarURL: message.author?.avatarURL() || undefined,
-            content: message.content,
-            username:
-              message.author.username + " ( " + message.author.id + " )",
+          await channel.send({
+            embeds: [embed],
             components: [row],
             allowedMentions: {
               repliedUser: false,
@@ -79,13 +120,9 @@ export default class syncUtils {
           });
         } catch (exc: any) {
           console.log(exc);
+          embed.setDescription(text);
           channel.send({
-            content:
-              message.member?.displayName +
-              "(" +
-              message.member?.id +
-              "):" +
-              message.content,
+            embeds: [embed],
             components: [row],
           });
         }

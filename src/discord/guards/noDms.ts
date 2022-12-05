@@ -5,7 +5,7 @@ export const noDms = async (
   client: Client,
   next: Next
 ) => {
-  if (!interaction || interaction.inGuild()) {
+  if ((!interaction || interaction.inGuild()) && interaction.guildId) {
     await next();
   }else{
     interaction.channel?.send("You have to be in a guild to execute this!")
