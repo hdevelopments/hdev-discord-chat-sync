@@ -16,6 +16,34 @@ Copy .env_empty and name it to .env_dev or .env
 
 Put your credentials in it and run npm run dev or npm run start ( depending on what environment you are )
 
+#  Public Instance:
+
+Invite: https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=412854111296&scope=bot%20applications.commands
+
+Why do it needs the permissions:
+
+["Create Webhooks"]: (Optional) This is an optional permission if not it wont make a pretty chat message it will go to: <br>
+**NAME**: text<br>
+instead of pretty<br>
+Name ( like normal user ):<br>
+text
+
+["Embed links"]: (Optionall) To make it possible to embed picture urls
+
+["External Emojis / Sticker"]: (Optional)  For future Feature to make it possible to use external emojis.
+
+["Attach Files"]: For future feature ( I make a option for disable this )
+
+["Read message history"]: For future feature to sync up chats if the bot went down or joining of a new guild
+
+["Add Reaktions"]: For possible future feature
+
+["Read / Send Messages"]: I think you know why....
+
+["Send messages in Threads"]: For a feature in the future...
+
+
+
 # Other Stuff:
 
  [![Bots for Discord](https://discords.com/bots/api/bot/1046756800260735058/widget)](https://discords.com/bots/bots/1046756800260735058)
