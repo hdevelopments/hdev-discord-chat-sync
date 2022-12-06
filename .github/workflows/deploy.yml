@@ -31,4 +31,5 @@ jobs:
           cd chatSync
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
+          export PM2_DIR=~/.pm2
           ./update.sh
