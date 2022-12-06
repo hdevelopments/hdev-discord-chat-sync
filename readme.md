@@ -18,15 +18,9 @@ Put your credentials in it and run npm run dev or npm run start ( depending on w
 
 #  Public Instance:
 
-Invite: https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=412854111296&scope=bot%20applications.commands
+Invite: https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=412317239361&scope=bot%20applications.commands
 
 Why do it needs the permissions:
-
-["Create Webhooks"]: (Optional) This is an optional permission if not it wont make a pretty chat message it will go to: <br>
-**NAME**: text<br>
-instead of pretty<br>
-Name ( like normal user ):<br>
-text
 
 ["Embed links"]: (Optionall) To make it possible to embed picture urls
 
