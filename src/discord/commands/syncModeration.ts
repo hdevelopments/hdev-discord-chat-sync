@@ -6,8 +6,8 @@ import {
   EmbedBuilder,
   GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
-  SelectMenuInteraction,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
 } from "discord.js";
 import {
   Discord,
@@ -54,7 +54,7 @@ class syncModeration {
     var categories = await this.guildConfigService.getAllCategories();
 
     // create menu for roles
-    const menu = new SelectMenuBuilder()
+    const menu = new StringSelectMenuBuilder()
       .addOptions(
         ...categories.map((x) => ({
           label: x.name + (x.nsfw ? "(NSFW)" : ""),
@@ -149,13 +149,13 @@ class syncModeration {
       category,
       interaction.member?.user!
     );
-    
+
     await this.guildConfigService.removeCategory(found);
     await interaction.editReply("Category successfully removed!");
   }
 
   @SelectMenuComponent({ id: "categories-menu" })
-  async handle(interaction: SelectMenuInteraction): Promise<unknown> {
+  async handle(interaction: StringSelectMenuInteraction): Promise<unknown> {
     await interaction.deferReply();
 
     // extract selected value by member
@@ -191,8 +191,10 @@ class syncModeration {
       interaction.guildId!,
       interaction.channelId
     );
-    var category = await this.guildConfigService.findCategory(new ObjectID(found?.category))
-   
+    var category = await this.guildConfigService.findCategory(
+      new ObjectID(found?.category)
+    );
+
     if (category) {
       var embed = new EmbedBuilder().setTitle("Information");
       embed.addFields(
@@ -200,7 +202,7 @@ class syncModeration {
         { name: "NSFW:", value: String(category.nsfw) }
       );
       await interaction.editReply({ embeds: [embed] });
-    }else{
+    } else {
       await interaction.editReply("This isnt a Chat Sync chat!");
     }
   }
