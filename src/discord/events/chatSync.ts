@@ -12,6 +12,7 @@ import {
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
 import syncUtils from "../../utils/syncModerationUtils";
+import { url } from "inspector";
 @Discord()
 export class chatSync {
   @Inject()
@@ -129,7 +130,9 @@ export class chatSync {
         .setCustomId("error")
         .setLabel("Message")
         .setStyle(TextInputStyle.Short)
-        .setValue("An error occured! (Guild / Channel is not existing anymore?)")
+        .setValue(
+          "An error occured! (Guild / Channel is not existing anymore?)"
+        )
         .setRequired(false);
       const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
         errorComponent
@@ -142,5 +145,15 @@ export class chatSync {
   async dummy(interaction: ButtonInteraction) {
     interaction.deferReply();
     interaction.deleteReply();
+  }
+  @ButtonComponent({ id: "details-links" })
+  async showLinks(interaction: ButtonInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    var urls = Array.from(
+      interaction.message.embeds[0].description?.matchAll(/(http[s]?:\/\/([^ \n])*)/gim) || []
+    ).map(x => x[0]).join("\n");
+    console.log(urls)
+    await interaction.editReply({ content: urls || "No Urls found!" });
   }
 }

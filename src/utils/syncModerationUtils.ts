@@ -4,6 +4,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  ColorResolvable,
   EmbedBuilder,
   hyperlink,
   Message,
@@ -45,6 +46,7 @@ export default class syncUtils {
         guildBtn,
         categoryBtn
       );
+    var author = await message.author.fetch(true);
 
     var embed = new EmbedBuilder();
 
@@ -52,40 +54,53 @@ export default class syncUtils {
       name: message.author.username,
       iconURL: message.author.avatarURL() || undefined,
     });
+    embed.setFooter({
+      text: "From the Guild: " + message.guild?.name,
+      iconURL: message.guild?.iconURL() || undefined,
+    });
+    embed.setColor((author.hexAccentColor as ColorResolvable) || "Blurple");
     embed.setTimestamp(Date.now());
-    embed.setColor("Blue");
     var isInBotCache = false;
     var text = message.content;
-    var animatedemojis = message.content.matchAll(/<a:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm);
-    var emojis = message.content.matchAll(/<:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm);
-    console.log(text);
-
-
+    var animatedemojis = message.content.matchAll(
+      /<a:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm
+    );
+    var emojis = message.content.matchAll(
+      /<:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm
+    );
+    var tenorUrls = Array.from(
+      message.content.matchAll(/(https:\/\/tenor.com\/view[^ ]*)/gm)
+    );
     for (let n of emojis) {
-      console.log(n);
       let url = hyperlink(
         n[0],
         "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
         "The custom Emote"
       );
       text = text.replaceAll(n[0], url);
-      console.log(text);
       if (bot.emojis.cache.get(n[1])) {
         isInBotCache = true;
       }
     }
     for (let n of animatedemojis) {
-      console.log(n);
       let url = hyperlink(
         n[0],
         "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
         "The custom Emote"
       );
       text = text.replaceAll(n[0], url);
-      console.log(text);
       if (bot.emojis.cache.get(n[1])) {
         isInBotCache = true;
       }
+    }
+    for (let n of tenorUrls) {
+      console.log(n);
+      console.log(tenorUrls);
+      const links = new ButtonBuilder()
+        .setLabel("Click if you want to see embeded versions of the links!!")
+        .setStyle(ButtonStyle.Primary)
+        .setCustomId("details-links");
+      row.addComponents(links);
     }
     allGuilds.forEach(async (x) => {
       if (!x.channel || x.channel === message.channelId) return;
@@ -100,7 +115,9 @@ export default class syncUtils {
         try {
           if (isInBotCache) {
             const customemojis = new ButtonBuilder()
-              .setLabel("To see some of the custom Emojis you need to be in the guild!")
+              .setLabel(
+                "To see some of the custom Emojis you need to be in the guild!"
+              )
               .setStyle(ButtonStyle.Primary)
               .setCustomId("details-customemojis")
               .setDisabled(true);
@@ -126,7 +143,9 @@ export default class syncUtils {
             components: [row],
           });
         }
-      } catch (exc: any) {}
+      } catch (exc: any) {
+        console.log(exc);
+      }
     });
   }
 }

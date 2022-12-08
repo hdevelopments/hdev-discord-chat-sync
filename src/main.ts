@@ -1,8 +1,6 @@
 import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
 import {
-  BaseGuildTextChannel,
-  DMChannel,
   Interaction,
   Message,
   Partials,
@@ -59,9 +57,16 @@ bot.once("ready", async () => {
 
 bot.on("interactionCreate", (interaction: Interaction) => {
   try {
+    // do not execute interaction, if it's pagination (avoid warning: select-menu/button interaction not found)
+    if (interaction.isButton() || interaction.isStringSelectMenu()) {
+      if (interaction.customId.startsWith("discordx@pagination@")) {
+        return;
+      }
+    }
     bot.executeInteraction(interaction);
+    return
   } catch (exc) {
-      console.log(exc);
+    console.log(exc);
   }
 });
 
@@ -69,7 +74,7 @@ bot.on("messageCreate", (message: Message) => {
   try {
     bot.executeCommand(message);
   } catch (exc) {
-      console.log(exc);
+    console.log(exc);
   }
 });
 

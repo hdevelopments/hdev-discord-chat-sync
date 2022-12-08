@@ -206,4 +206,24 @@ class syncModeration {
       await interaction.editReply("This isnt a Chat Sync chat!");
     }
   }
+
+  @Slash({
+    description: "Removes the current channel from being synced.",
+  })
+  @SlashGroup("moderation")
+  async remove(interaction: CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+    var foundchannel = await this.guildConfigService.getByChannel(
+      interaction.guildId!,
+      interaction.channelId
+    );
+    var found = await this.guildConfigService.getOrCreate(interaction.guildId!);
+    try {
+      delete found.channels[foundchannel?.channel!];
+      await this.guildConfigService.save(found);
+      await interaction.editReply({ content: "Success" });
+    } catch (exc: any) {
+      await interaction.editReply({ content: "Failed" });
+    }
+  }
 }
