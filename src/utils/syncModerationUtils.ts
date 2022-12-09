@@ -63,13 +63,11 @@ export default class syncUtils {
     var isInBotCache = false;
     var text = message.content;
     var animatedemojis = message.content.matchAll(
-      /<a:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm
+      /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
     );
-    var emojis = message.content.matchAll(
-      /<:[A-Za-z0-9\_\+\/\{\}\\]+:(\d+)>/gm
-    );
-    var tenorUrls = Array.from(
-      message.content.matchAll(/(https:\/\/tenor.com\/view[^ ]*)/gm)
+    var emojis = message.content.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
+    var urls = Array.from(
+      message.content.matchAll(/(http[s]?:\/\/([^ \n])*)/gim)
     );
     for (let n of emojis) {
       let url = hyperlink(
@@ -93,41 +91,44 @@ export default class syncUtils {
         isInBotCache = true;
       }
     }
-    for (let n of tenorUrls) {
-      console.log(n);
-      console.log(tenorUrls);
-      const links = new ButtonBuilder()
-        .setLabel("Click if you want to see embeded versions of the links!!")
+
+    if (isInBotCache) {
+      const customemojis = new ButtonBuilder()
+        .setLabel(
+          "To see some of the custom Emojis you need to be in the guild!"
+        )
         .setStyle(ButtonStyle.Primary)
-        .setCustomId("details-links");
-      row.addComponents(links);
+        .setCustomId("details-customemojis")
+        .setDisabled(true);
+      row.addComponents(customemojis);
     }
     allGuilds.forEach(async (x) => {
       if (!x.channel || x.channel === message.channelId) return;
-
+      var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       try {
         var channel = (bot.channels.cache.find(
           (channel) => channel.id === x.channel
         ) || (await bot.channels.fetch(x.channel))) as BaseGuildTextChannel;
 
         if (!channel) return;
+        var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(row);
 
+        if (urls.length > 0 && !guildConfig.configs["noEmbededLinks"]) {
+          const links = new ButtonBuilder()
+            .setLabel(
+              "Click if you want to see embeded versions of the links!!"
+            )
+            .setStyle(ButtonStyle.Primary)
+            .setCustomId("details-links");
+
+          rowForGuild.addComponents(links);
+        }
         try {
-          if (isInBotCache) {
-            const customemojis = new ButtonBuilder()
-              .setLabel(
-                "To see some of the custom Emojis you need to be in the guild!"
-              )
-              .setStyle(ButtonStyle.Primary)
-              .setCustomId("details-customemojis")
-              .setDisabled(true);
-            row.addComponents(customemojis);
-          }
           embed.setDescription(text);
 
           await channel.send({
             embeds: [embed],
-            components: [row],
+            components: [rowForGuild],
             allowedMentions: {
               repliedUser: false,
               parse: [],

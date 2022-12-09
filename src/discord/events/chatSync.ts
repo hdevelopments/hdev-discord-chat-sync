@@ -70,10 +70,11 @@ export class chatSync {
     try {
       var channel = (bot.channels.cache.find((x) => x.id === channelId) ||
         (await bot.channels.fetch(channelId))) as BaseGuildTextChannel;
+      var guildConfig = await this.guildConfig.getOrCreate(channel.guildId!);
       var message =
         channel?.messages.cache.find((x) => x.id === messageId) ||
         (await channel.messages.fetch(messageId));
-
+      console.log(guildConfig.configs);
       const guildComponent = new TextInputBuilder()
         .setCustomId("guild-details")
         .setLabel("Guild:")
@@ -103,21 +104,25 @@ export class chatSync {
       const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
         messageComponent
       );
-
       const inviteComponent = new TextInputBuilder()
         .setCustomId("invite-details")
         .setLabel("Invite:")
         .setStyle(TextInputStyle.Short)
-        .setValue("Not Allowed!")
+        .setValue("No Invites!")
         .setRequired(false);
-      try {
-        inviteComponent.setValue(
-          message.guild.invites.cache.find((x) => x.inviterId === bot.user?.id)
-            ?.url || (await message.guild.invites.create(message.channelId)).url
-        );
-      } catch (exc: any) {
-        // Ignore
+      if (!guildConfig.configs["noInvites"]) {
+        try {
+          inviteComponent.setValue(
+            message.guild.invites.cache.find(
+              (x) => x.inviterId === bot.user?.id
+            )?.url ||
+              (await message.guild.invites.create(message.channelId)).url
+          );
+        } catch (exc: any) {
+          // Ignore
+        }
       }
+
       const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(
         inviteComponent
       );
@@ -151,9 +156,13 @@ export class chatSync {
     await interaction.deferReply({ ephemeral: true });
 
     var urls = Array.from(
-      interaction.message.embeds[0].description?.matchAll(/(http[s]?:\/\/([^ \n])*)/gim) || []
-    ).map(x => x[0]).join("\n");
-    console.log(urls)
+      interaction.message.embeds[0].description?.matchAll(
+        /(http[s]?:\/\/([^ \n])*)/gim
+      ) || []
+    )
+      .map((x) => x[0])
+      .join("\n");
+
     await interaction.editReply({ content: urls || "No Urls found!" });
   }
 }

@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ApplicationCommandOptionType,
+  AutocompleteInteraction,
   ChannelType,
   CommandInteraction,
   EmbedBuilder,
@@ -14,6 +15,8 @@ import {
   Guard,
   SelectMenuComponent,
   Slash,
+  SlashChoice,
+  SlashChoiceType,
   SlashGroup,
   SlashOption,
 } from "discordx";
@@ -21,6 +24,11 @@ import { ObjectID } from "ts-mongodb-orm";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
+
+export const options: { [key: string]: string[] } = {
+  ["noInvites"]: ["True", "False"],
+  ["noEmbededLinks"]: ["True", "False"],
+};
 
 @Discord()
 @SlashGroup({
@@ -225,5 +233,56 @@ class syncModeration {
     } catch (exc: any) {
       await interaction.editReply({ content: "Failed" });
     }
+  }
+  @Slash({
+    description: "Lets you set some options.",
+  })
+  @SlashGroup("moderation")
+  async set(
+    @SlashChoice(
+      ...Object.entries(options).map((data) => {
+        return { name: data[0], value: data[0] };
+      })
+    )
+    @SlashOption({
+      description: "The Option",
+      name: "option",
+      type: ApplicationCommandOptionType.String,
+      required: true,
+    })
+    option: string,
+    @SlashOption({
+      description: "The new Value",
+      name: "value",
+      autocomplete: syncModeration.optionCompleter,
+      type: ApplicationCommandOptionType.String,
+      required: true,
+    })
+    newValue: any,
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true });
+    var config = await this.guildConfigService.getOrCreate(
+      interaction.guildId!
+    );
+
+    config.configs[option] = newValue;
+
+    await this.guildConfigService.save(config);
+    await interaction.editReply("Success!");
+  }
+
+  static optionCompleter(interaction: AutocompleteInteraction) {
+    var option = interaction.options.getString("option");
+    if (!option) {
+      interaction.respond([{ name: "please select a option!", value: "no" }]);
+      return;
+    }
+
+    interaction.respond(
+      options[option].map((x) => {
+        return { name: x, value: x };
+      })
+    );
   }
 }

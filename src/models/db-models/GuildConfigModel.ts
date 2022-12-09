@@ -10,7 +10,7 @@ export default class guildConfig extends BaseModel {
   banned: boolean = false;
 
   @Field()
-  noInvite: boolean = true
+  configs: { [key: string]: any } = {};
 
   @Field({ isRequired: false })
   channels: {
