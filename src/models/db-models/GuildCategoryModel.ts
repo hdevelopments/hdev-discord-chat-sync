@@ -10,5 +10,6 @@ export default class guildCategory extends BaseModel{
     nsfw: boolean = false
     @Field()
     owner?: string
-
+    @Field()
+    description?: string
 }

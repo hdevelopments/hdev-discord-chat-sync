@@ -67,6 +67,7 @@ class syncModeration {
         ...categories.map((x) => ({
           label: x.name + (x.nsfw ? "(NSFW)" : ""),
           value: x._id.toString(),
+          description: x.description,
         }))
       )
       .setCustomId("categories-menu");
@@ -103,7 +104,7 @@ class syncModeration {
     found.banned = !found.banned;
     await this.guildConfigService.save(found);
 
-    await interaction.editReply("Successfully set the chat channel!");
+    await interaction.editReply("Successfully toggled the ban!");
   }
 
   @Slash({
@@ -124,6 +125,12 @@ class syncModeration {
       name: "nsfw",
     })
     nsfw: boolean,
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      description: "What is the description?",
+      name: "description",
+    })
+    description: string,
     interaction: CommandInteraction
   ) {
     await interaction.deferReply();
@@ -131,10 +138,9 @@ class syncModeration {
       category,
       interaction.member?.user!
     );
-    if (nsfw) {
-      found.nsfw = nsfw;
+      found.nsfw = nsfw === true;
+      found.description = description
       await this.guildConfigService.saveCategory(found);
-    }
     await interaction.editReply("Category successfully created!");
   }
 
