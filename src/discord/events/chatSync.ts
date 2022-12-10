@@ -39,24 +39,31 @@ export class chatSync {
     ) {
       return;
     }
-    if (await this.phishingService.checkForPhishing(message)) {
 
-      var logchannel = (bot.channels.cache.get("1051147189243621477") || await bot.channels.fetch("1051147189243621477")) as TextBasedChannel
-      logchannel.send(`Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${message.content}>||\nGuild: ${message.guild.toString()}-${message.guildId}`)
-      await message.channel.send(
-        `${message.author.toString()} Phishing Link detected!`
-      );
-      if (message.deletable) {
-        message.delete().catch((x) => {
-          //ignore
-        });
-      }
-      return;
-    }
     var config = await this.guildConfig.getOrCreate(message.guildId!);
     if (config.banned || !config.channels) return;
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
+      if (await this.phishingService.checkForPhishing(message)) {
+        var logchannel = (bot.channels.cache.get("1051147189243621477") ||
+          (await bot.channels.fetch(
+            "1051147189243621477"
+          ))) as TextBasedChannel;
+        logchannel.send(
+          `Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${
+            message.content
+          }>||\nGuild: ${message.guild.toString()}-${message.guildId}`
+        );
+        await message.channel.send(
+          `${message.author.toString()} Phishing Link detected!`
+        );
+        if (message.deletable) {
+          message.delete().catch((x) => {
+            //ignore
+          });
+        }
+        return;
+      }
       if (Date.now() - (foundChannel.lastMessage || 0) < 1000) {
         message.channel
           .send("Toooooo fast cowboy! (" + message.author.toString() + ")")
