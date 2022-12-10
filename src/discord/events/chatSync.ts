@@ -6,17 +6,20 @@ import {
   ButtonInteraction,
   MessageType,
   ModalBuilder,
+  TextBasedChannel,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
 import syncUtils from "../../utils/syncModerationUtils";
-import { url } from "inspector";
+import { Phishing } from "./anti-phishing";
 @Discord()
 export class chatSync {
   @Inject()
   private guildConfig: GuildConfigService;
+  @Inject()
+  private phishingService: Phishing;
   @Inject()
   private syncUtils: syncUtils;
 
@@ -34,6 +37,20 @@ export class chatSync {
       message.type === MessageType.GuildBoostTier3 ||
       message.type === MessageType.ThreadStarterMessage
     ) {
+      return;
+    }
+    if (await this.phishingService.checkForPhishing(message)) {
+
+      var logchannel = (bot.channels.cache.get("1051147189243621477") || await bot.channels.fetch("1051147189243621477")) as TextBasedChannel
+      logchannel.send(`Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${message.content}>||\nGuild: ${message.guild.toString()}-${message.guildId}`)
+      await message.channel.send(
+        `${message.author.toString()} Phishing Link detected!`
+      );
+      if (message.deletable) {
+        message.delete().catch((x) => {
+          //ignore
+        });
+      }
       return;
     }
     var config = await this.guildConfig.getOrCreate(message.guildId!);
