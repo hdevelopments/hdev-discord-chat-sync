@@ -1,16 +1,14 @@
 import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
-import {
-  Interaction,
-  Message,
-  Partials,
-} from "discord.js";
+import { Interaction, Message, Partials } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client, DIService, typeDiDependencyRegistryEngine } from "discordx";
 import Config from "./discordConfig";
 import { NoBot } from "./discord/guards/noBots";
 import { Container, Service } from "typedi";
+import discordsApi from "./utils/botsfordiscordapi";
 
+var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
   .setService(Service)
   .setInjector(Container);
@@ -51,7 +49,10 @@ bot.once("ready", async () => {
       console.log(exc.rawError);
     };
   }
-
+  await discords.syncUp();
+  setInterval(async () => {
+    await discords.syncUp();
+  }, 30*60*1000);
   console.log("Bot started");
 });
 
@@ -64,7 +65,7 @@ bot.on("interactionCreate", (interaction: Interaction) => {
       }
     }
     bot.executeInteraction(interaction);
-    return
+    return;
   } catch (exc) {
     console.log(exc);
   }
