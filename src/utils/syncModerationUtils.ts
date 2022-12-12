@@ -111,13 +111,10 @@ export default class syncUtils {
         channel = await bot.channels.fetch(x.channel, {cache: true}) as BaseGuildTextChannel;
       } catch (exc: any) {
         console.log(exc);
-        var foundGuild = allGuilds.find((x) => x.guild === x.guild);
-        console.log(foundGuild)
+        var foundGuild = allGuilds.find((guildcfg) => guildcfg.guild === x.guild);
         if (!foundGuild) return;
         delete foundGuild?.channels[x.channel];
         await this.GuildConfig.save(foundGuild!);
-        console.log("AfterAfterAfterAfterAfterAfter" )
-        console.log(foundGuild)
         console.log("Removed " + x.channel)
         return;
       }
