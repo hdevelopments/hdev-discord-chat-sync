@@ -115,9 +115,11 @@ export default class syncUtils {
       } catch (exc: any) {
         console.log(exc);
         var foundGuild = allGuilds.find((x) => x.guild === x.guild);
+        console.log(foundGuild)
         if (!foundGuild) return;
         delete foundGuild?.channels[x.channel];
         await this.GuildConfig.save(foundGuild!);
+        console.log("Removed " + x.channel)
         return;
       }
       if (!channel) return;
