@@ -1,3 +1,4 @@
+import { Channel } from "diagnostics_channel";
 import {
   ActionRowBuilder,
   BaseGuildTextChannel,
@@ -23,14 +24,15 @@ export default class syncUtils {
     var foundCategory = await this.GuildConfig.findCategory(
       new ObjectID(category)
     );
-    var allGuilds = (await this.GuildConfig.getAllChannels())
+    var allGuilds = await this.GuildConfig.getAllChannels();
+    var allChannels = allGuilds
       .filter((x) => !x.banned)
       .flatMap((x) =>
         Object.entries(x.channels)
           .filter((x) => x[1].category === category)
           .map((x) => x[1])
       );
-
+    console.log(allGuilds);
     const guildBtn = new ButtonBuilder()
       .setLabel("Details")
       .setEmoji("👋")
@@ -102,50 +104,55 @@ export default class syncUtils {
         .setDisabled(true);
       row.addComponents(customemojis);
     }
-    allGuilds.forEach(async (x) => {
+    allChannels.forEach(async (x, i) => {
       if (!x.channel || x.channel === message.channelId) return;
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
+      var channel: BaseGuildTextChannel;
       try {
-        var channel = (bot.channels.cache.find(
+        channel = (bot.channels.cache.find(
           (channel) => channel.id === x.channel
         ) || (await bot.channels.fetch(x.channel))) as BaseGuildTextChannel;
-
-        if (!channel) return;
-        var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(row);
-
-        if (urls.length > 0 && !guildConfig.configs["noEmbededLinks"]) {
-          const links = new ButtonBuilder()
-            .setLabel(
-              "Click if you want to see embeded versions of the links!!"
-            )
-            .setStyle(ButtonStyle.Primary)
-            .setCustomId("details-links");
-
-          rowForGuild.addComponents(links);
-        }
-        try {
-          embed.setDescription(text);
-
-          await channel.send({
-            embeds: [embed],
-            components: [rowForGuild],
-            allowedMentions: {
-              repliedUser: false,
-              parse: [],
-              roles: [],
-              users: [],
-            },
-          });
-        } catch (exc: any) {
-          console.log(exc);
-          embed.setDescription(text);
-          channel.send({
-            embeds: [embed],
-            components: [row],
-          });
-        }
       } catch (exc: any) {
         console.log(exc);
+        var foundGuild = allGuilds.find((x) => x.guild === x.guild);
+        if (!foundGuild) return;
+        delete foundGuild?.channels[x.channel];
+        await this.GuildConfig.save(foundGuild!);
+        return;
+      }
+      if (!channel) return;
+      var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
+        row
+      );
+
+      if (urls.length > 0 && !guildConfig.configs["noEmbededLinks"]) {
+        const links = new ButtonBuilder()
+          .setLabel("Click if you want to see embeded versions of the links!!")
+          .setStyle(ButtonStyle.Primary)
+          .setCustomId("details-links");
+
+        rowForGuild.addComponents(links);
+      }
+      try {
+        embed.setDescription(text);
+
+        await channel.send({
+          embeds: [embed],
+          components: [rowForGuild],
+          allowedMentions: {
+            repliedUser: false,
+            parse: [],
+            roles: [],
+            users: [],
+          },
+        });
+      } catch (exc: any) {
+        console.log(exc);
+        embed.setDescription(text);
+        channel.send({
+          embeds: [embed],
+          components: [row],
+        });
       }
     });
   }

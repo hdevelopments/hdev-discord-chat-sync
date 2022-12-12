@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
-import { Interaction, Message, Partials } from "discord.js";
+import { ActivityType, Interaction, Message, Partials } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client, DIService, typeDiDependencyRegistryEngine } from "discordx";
 import Config from "./discordConfig";
@@ -37,6 +37,26 @@ export const bot = new Client({
   },
 });
 
+
+
+function syncActivities() {
+  const activities = [
+    {
+      name: `Chatting with: ${bot.guilds.cache.size} guilds`,
+    },
+    {
+      name: `Support: https://discord.gg/5Nxm6peEt4`,
+    },
+  ]
+
+  bot.user?.setPresence({
+    status: "online",
+    activities: [
+      activities[Math.floor(Math.random() * activities.length) ]
+    ],
+  });
+}
+
 bot.once("ready", async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
@@ -49,10 +69,14 @@ bot.once("ready", async () => {
       console.log(exc.rawError);
     };
   }
+  syncActivities();
+  setInterval(() => {
+    syncActivities();
+  }, 30 * 1000);
   await discords.syncUp();
   setInterval(async () => {
     await discords.syncUp();
-  }, 30*60*1000);
+  }, 30 * 60 * 1000);
   console.log("Bot started");
 });
 
