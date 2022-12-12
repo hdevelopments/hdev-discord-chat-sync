@@ -10,6 +10,7 @@ class discordsApi {
         }}).then(x =>{
             return x.data
         }).then(x => {
+            console.log("Synced with discords")
             console.log(x)
         }).catch(x => {
             console.error(x)
