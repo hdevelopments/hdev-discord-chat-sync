@@ -32,7 +32,6 @@ export default class syncUtils {
           .filter((x) => x[1].category === category)
           .map((x) => x[1])
       );
-    console.log(allGuilds);
     const guildBtn = new ButtonBuilder()
       .setLabel("Details")
       .setEmoji("👋")
@@ -109,9 +108,7 @@ export default class syncUtils {
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       var channel: BaseGuildTextChannel;
       try {
-        channel = (bot.channels.cache.find(
-          (channel) => channel.id === x.channel
-        ) || (await bot.channels.fetch(x.channel))) as BaseGuildTextChannel;
+        channel = await bot.channels.fetch(x.channel, {cache: true}) as BaseGuildTextChannel;
       } catch (exc: any) {
         console.log(exc);
         var foundGuild = allGuilds.find((x) => x.guild === x.guild);
@@ -119,6 +116,8 @@ export default class syncUtils {
         if (!foundGuild) return;
         delete foundGuild?.channels[x.channel];
         await this.GuildConfig.save(foundGuild!);
+        console.log("AfterAfterAfterAfterAfterAfter" )
+        console.log(foundGuild)
         console.log("Removed " + x.channel)
         return;
       }

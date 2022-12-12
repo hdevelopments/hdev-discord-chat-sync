@@ -45,10 +45,10 @@ export class chatSync {
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
       if (await this.phishingService.checkForPhishing(message)) {
-        var logchannel = (bot.channels.cache.get("1051147189243621477") ||
-          (await bot.channels.fetch(
-            "1051147189243621477"
-          ))) as TextBasedChannel;
+        var logchannel = (await bot.channels.fetch(
+          "1051147189243621477"
+        )) as TextBasedChannel;
+
         logchannel.send(
           `Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${
             message.content
@@ -92,8 +92,8 @@ export class chatSync {
       .setCustomId("details-dummy");
 
     try {
-      var channel = (bot.channels.cache.find((x) => x.id === channelId) ||
-        (await bot.channels.fetch(channelId))) as BaseGuildTextChannel;
+      var channel = 
+        await bot.channels.fetch(channelId) as BaseGuildTextChannel;
       var guildConfig = await this.guildConfig.getOrCreate(channel.guildId!);
       var message =
         channel?.messages.cache.find((x) => x.id === messageId) ||
