@@ -133,9 +133,8 @@ export default class syncUtils {
 
         rowForGuild.addComponents(links);
       }
+      embed.setDescription(text);
       try {
-        embed.setDescription(text);
-
         await channel.send({
           embeds: [embed],
           components: [rowForGuild],
