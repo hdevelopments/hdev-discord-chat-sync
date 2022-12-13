@@ -50,7 +50,6 @@ function syncActivities() {
   ]
 
   bot.user?.setPresence({
-    status: "online",
     activities: [
       activities[Math.floor(Math.random() * activities.length) ]
     ],
