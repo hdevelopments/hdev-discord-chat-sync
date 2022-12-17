@@ -1,9 +1,7 @@
-import { Channel } from "diagnostics_channel";
 import {
   ActionRowBuilder,
   BaseGuildTextChannel,
   ButtonBuilder,
-  ButtonInteraction,
   ButtonStyle,
   ColorResolvable,
   EmbedBuilder,
@@ -21,6 +19,7 @@ export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
   async sendToAllChannels(category: string, message: Message) {
+    if (!message.content || message.content.trim().length === 0) return;
     var foundCategory = await this.GuildConfig.findCategory(
       new ObjectID(category)
     );
@@ -108,48 +107,97 @@ export default class syncUtils {
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       var channel: BaseGuildTextChannel;
       try {
-        channel = await bot.channels.fetch(x.channel, {cache: true}) as BaseGuildTextChannel;
+        channel = (await bot.channels.fetch(x.channel, {
+          cache: true,
+        })) as BaseGuildTextChannel;
       } catch (exc: any) {
         console.log(exc);
-        var foundGuild = allGuilds.find((guildcfg) => guildcfg.guild === x.guild);
+        var foundGuild = allGuilds.find(
+          (guildcfg) => guildcfg.guild === x.guild
+        );
         if (!foundGuild) return;
         delete foundGuild?.channels[x.channel];
         await this.GuildConfig.save(foundGuild!);
-        console.log("Removed " + x.channel)
+        console.log("Removed " + x.channel);
         return;
       }
       if (!channel) return;
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
-
-      if (urls.length > 0 && !guildConfig.configs["noEmbededLinks"]) {
+      if (
+        urls.length > 0 &&
+        Boolean(guildConfig.configs["noEmbeddedLinks"]) === true && guildConfig.configs["type"] !=
+        "Webhook ( Small, it does need the Webhook permission! )"
+      ) {
         const links = new ButtonBuilder()
-          .setLabel("Click if you want to see embeded versions of the links!!")
+          .setLabel("Preview embedded version of links!")
           .setStyle(ButtonStyle.Primary)
           .setCustomId("details-links");
 
         rowForGuild.addComponents(links);
       }
-      embed.setDescription(text);
-      try {
-        await channel.send({
-          embeds: [embed],
-          components: [rowForGuild],
-          allowedMentions: {
-            repliedUser: false,
-            parse: [],
-            roles: [],
-            users: [],
-          },
-        });
-      } catch (exc: any) {
-        console.log(exc);
+      if (
+        guildConfig.configs["type"] !=
+        "Webhook ( Small, it does need the Webhook permission! )"
+      ) {
         embed.setDescription(text);
-        channel.send({
-          embeds: [embed],
-          components: [row],
-        });
+        try {
+          await channel.send({
+            embeds: [embed],
+            components: [rowForGuild],
+            allowedMentions: {
+              repliedUser: false,
+              parse: [],
+              roles: [],
+              users: [],
+            },
+          });
+        } catch (exc: any) {
+          console.log(exc);
+          embed.setDescription(text);
+          channel.send({
+            embeds: [embed],
+            components: [row],
+          });
+        }
+      } else {
+        try {
+          var webhook =
+            (await channel.fetchWebhooks()).find(
+              (x) => x.owner?.id === bot.user?.id
+            ) ||
+            (await channel.createWebhook({
+              name: "Hedges Chatter Webhook",
+              reason: "No valid webhook found before!",
+            }));
+          webhook.send({
+            content: text,
+            components: [rowForGuild],
+            username: message.member?.nickname || message.author.username,
+            avatarURL: message.author.avatarURL() || undefined,
+            allowedMentions: {
+              repliedUser: false,
+              parse: [],
+              roles: [],
+              users: [],
+            },
+          });
+        } catch (exc) {
+          channel.send({
+            content:
+              (message.member?.nickname || message.author.username) +
+              ": " +
+              message.content,
+            components: [rowForGuild],
+            allowedMentions: {
+              repliedUser: false,
+              parse: [],
+              roles: [],
+              users: [],
+            },
+          });
+        }
       }
     });
   }

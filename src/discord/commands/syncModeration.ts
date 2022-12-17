@@ -27,7 +27,8 @@ import { noDms } from "../guards/noDms";
 
 export const options: { [key: string]: string[] } = {
   ["noInvites"]: ["True", "False"],
-  ["noEmbededLinks"]: ["True", "False"],
+  ["noEmbeddedLinks"]: ["True", "False"],
+  ["type"]: ["Embed ( Big, Default )", "Webhook ( Small, it does need the Webhook permission! )"],
 };
 
 @Discord()

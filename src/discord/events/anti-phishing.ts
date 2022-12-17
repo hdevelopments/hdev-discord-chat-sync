@@ -20,10 +20,12 @@ export class Phishing {
           .then(async (x: phishingResponse) => {
             if (x.category !== "safe") {
               res({ result: true, url: url });
+            }else{
+              res({ result: false, url: url });
             }
           })
           .catch((x) => {
-            rej({ result: false, url: url });
+            res({ result: false, url: url });
             // Ignore
           });
       })
@@ -40,7 +42,7 @@ export class Phishing {
             res({ result: Boolean(x), url: url });
           })
           .catch((x) => {
-            rej({ result: false, url: url });
+            res({ result: false, url: url });
             // Ignore
           });
       })
@@ -83,7 +85,7 @@ export class Phishing {
         var found = values.find((data: any) => {
           return (data as { result: boolean; url: string }).result;
         }) as { result: boolean; url: string } | undefined;
-        return found !== undefined;
+        return found !== undefined && found.result || false;
       } catch (x) {
         console.log(x);
       }

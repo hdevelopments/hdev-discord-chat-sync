@@ -44,7 +44,8 @@ export class chatSync {
     if (config.banned || !config.channels) return;
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
-      if (await this.phishingService.checkForPhishing(message)) {
+      var phishingresult = await this.phishingService.checkForPhishing(message) 
+      if (phishingresult === true) {
         var logchannel = (await bot.channels.fetch(
           "1051147189243621477"
         )) as TextBasedChannel;
@@ -64,7 +65,12 @@ export class chatSync {
         }
         return;
       }
-      if (config.guild !== "995759386142179358" && config.guild !== "952138215136055329" && !config.vip && Date.now() - (foundChannel.lastMessage || 0) < 500) {
+      if (
+        config.guild !== "995759386142179358" &&
+        config.guild !== "952138215136055329" &&
+        !config.vip &&
+        Date.now() - (foundChannel.lastMessage || 0) < 500
+      ) {
         message.channel
           .send("Toooooo fast cowboy! (" + message.author.toString() + ")")
           .then((x) => {
@@ -92,13 +98,13 @@ export class chatSync {
       .setCustomId("details-dummy");
 
     try {
-      var channel = 
-        await bot.channels.fetch(channelId) as BaseGuildTextChannel;
+      var channel = (await bot.channels.fetch(
+        channelId
+      )) as BaseGuildTextChannel;
       var guildConfig = await this.guildConfig.getOrCreate(channel.guildId!);
       var message =
         channel?.messages.cache.find((x) => x.id === messageId) ||
         (await channel.messages.fetch(messageId));
-      console.log(guildConfig.configs);
       const guildComponent = new TextInputBuilder()
         .setCustomId("guild-details")
         .setLabel("Guild:")
