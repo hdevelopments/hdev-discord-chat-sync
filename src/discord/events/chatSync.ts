@@ -64,7 +64,7 @@ export class chatSync {
         }
         return;
       }
-      if (Date.now() - (foundChannel.lastMessage || 0) < 1000) {
+      if (config.guild !== "995759386142179358" && config.guild !== "952138215136055329" && !config.vip && Date.now() - (foundChannel.lastMessage || 0) < 500) {
         message.channel
           .send("Toooooo fast cowboy! (" + message.author.toString() + ")")
           .then((x) => {

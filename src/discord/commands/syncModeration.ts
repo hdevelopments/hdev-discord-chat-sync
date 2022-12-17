@@ -108,6 +108,28 @@ class syncModeration {
   }
 
   @Slash({
+    description: "VIP a Guild.",
+    guilds: ["932286006156222495", "995759386142179358"],
+  })
+  async toggleban(
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      description: "The Guild",
+      name: "guild",
+      required: true,
+    })
+    guild: string,
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply();
+    var found = await this.guildConfigService.getOrCreate(guild);
+    found.banned = !found.banned;
+    await this.guildConfigService.save(found);
+
+    await interaction.editReply("Successfully toggled the ban!");
+  }
+  
+  @Slash({
     description: "Adds a Category.",
     guilds: ["932286006156222495", "995759386142179358"],
   })

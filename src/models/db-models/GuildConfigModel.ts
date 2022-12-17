@@ -12,6 +12,9 @@ export default class guildConfig extends BaseModel {
   @Field()
   configs: { [key: string]: any } = {};
 
+  @Field()
+  vip: { [key: string]: any } = {};
+
   @Field({ isRequired: false })
   channels: {
     [key: string]: {
