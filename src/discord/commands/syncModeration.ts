@@ -111,7 +111,7 @@ class syncModeration {
     description: "VIP a Guild.",
     guilds: ["932286006156222495", "995759386142179358"],
   })
-  async toggleban(
+  async togglevip(
     @SlashOption({
       type: ApplicationCommandOptionType.String,
       description: "The Guild",
@@ -123,7 +123,7 @@ class syncModeration {
   ) {
     await interaction.deferReply();
     var found = await this.guildConfigService.getOrCreate(guild);
-    found.banned = !found.banned;
+    found.vip = !found.vip;
     await this.guildConfigService.save(found);
 
     await interaction.editReply("Successfully toggled the ban!");
