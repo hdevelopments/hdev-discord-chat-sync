@@ -18,7 +18,7 @@ Put your credentials in it and run npm run dev or npm run start ( depending on w
 
 #  Public Instance:
 
-Invite: https://discord.com/api/oauth2/authorize?client_id=1035581219372548206&permissions=532576332865&scope=bot%20applications.commands
+Invite: https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands
 
 Why do it needs the permissions:
 
