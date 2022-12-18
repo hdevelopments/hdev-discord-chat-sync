@@ -56,7 +56,7 @@ export default class syncUtils {
 
     embed.setAuthor({
       name: message.member?.nickname || message.author.username,
-      iconURL: message.author.avatarURL() || undefined,
+      iconURL: message.member?.avatarURL() || message.author.avatarURL() || undefined,
     });
 
     embed.setFooter({
@@ -204,7 +204,7 @@ export default class syncUtils {
               rowForGuild,
             ],
             username: message.member?.nickname || message.author.username,
-            avatarURL: message.author.avatarURL() || undefined,
+            avatarURL: message.member?.avatarURL() || message.author.avatarURL() || undefined,
             allowedMentions: {
               repliedUser: false,
               parse: [],
