@@ -51,7 +51,7 @@ export default class syncUtils {
     var embed = new EmbedBuilder();
 
     embed.setAuthor({
-      name: message.author.username,
+      name: message.member?.nickname || message.author.username,
       iconURL: message.author.avatarURL() || undefined,
     });
     embed.setFooter({
@@ -75,9 +75,10 @@ export default class syncUtils {
         "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
         "The custom Emote"
       );
-      text = text.replaceAll(n[0], url);
       if (bot.emojis.cache.get(n[1])) {
         isInBotCache = true;
+      } else {
+        text = text.replaceAll(n[0], url);
       }
     }
     for (let n of animatedemojis) {
@@ -86,17 +87,16 @@ export default class syncUtils {
         "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
         "The custom Emote"
       );
-      text = text.replaceAll(n[0], url);
       if (bot.emojis.cache.get(n[1])) {
         isInBotCache = true;
+      } else {
+        text = text.replaceAll(n[0], url);
       }
     }
 
     if (isInBotCache) {
       const customemojis = new ButtonBuilder()
-        .setLabel(
-          "To see some of the custom Emojis you need to be in the guild!"
-        )
+        .setLabel("Some Emojis are custom!")
         .setStyle(ButtonStyle.Primary)
         .setCustomId("details-customemojis")
         .setDisabled(true);
@@ -125,10 +125,14 @@ export default class syncUtils {
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
+      if (embed.data.author && Boolean(guildConfig.configs["noButtons"])) {
+        embed.data.author.name += `( ${message.author.id} )`;
+      }
       if (
         urls.length > 0 &&
-        Boolean(guildConfig.configs["noEmbeddedLinks"]) === true && guildConfig.configs["type"] !=
-        "Webhook ( Small, it does need the Webhook permission! )"
+        Boolean(guildConfig.configs["noEmbeddedLinks"]) === true &&
+        guildConfig.configs["type"] !=
+          "Webhook ( Small, it does need the Webhook permission! )"
       ) {
         const links = new ButtonBuilder()
           .setLabel("Preview embedded version of links!")
@@ -145,7 +149,9 @@ export default class syncUtils {
         try {
           await channel.send({
             embeds: [embed],
-            components: [rowForGuild],
+            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+              rowForGuild,
+            ],
             allowedMentions: {
               repliedUser: false,
               parse: [],
@@ -155,10 +161,17 @@ export default class syncUtils {
           });
         } catch (exc: any) {
           console.log(exc);
-          embed.setDescription(text);
           channel.send({
             embeds: [embed],
-            components: [row],
+            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+              row,
+            ],
+            allowedMentions: {
+              repliedUser: false,
+              parse: [],
+              roles: [],
+              users: [],
+            },
           });
         }
       } else {
@@ -173,7 +186,9 @@ export default class syncUtils {
             }));
           webhook.send({
             content: text,
-            components: [rowForGuild],
+            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+              rowForGuild,
+            ],
             username: message.member?.nickname || message.author.username,
             avatarURL: message.author.avatarURL() || undefined,
             allowedMentions: {
@@ -189,7 +204,9 @@ export default class syncUtils {
               (message.member?.nickname || message.author.username) +
               ": " +
               message.content,
-            components: [rowForGuild],
+            components:
+              (Boolean(guildConfig.configs["noButtons"]) && []) ||
+              [rowForGuild],
             allowedMentions: {
               repliedUser: false,
               parse: [],

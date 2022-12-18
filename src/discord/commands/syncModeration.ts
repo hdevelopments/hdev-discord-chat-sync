@@ -28,7 +28,11 @@ import { noDms } from "../guards/noDms";
 export const options: { [key: string]: string[] } = {
   ["noInvites"]: ["True", "False"],
   ["noEmbeddedLinks"]: ["True", "False"],
-  ["type"]: ["Embed ( Big, Default )", "Webhook ( Small, it does need the Webhook permission! )"],
+  ["type"]: [
+    "Embed ( Big, Default )",
+    "Webhook ( Small, it does need the Webhook permission! )",
+  ],
+  ["noButtons"]: ["True", "False"],
 };
 
 @Discord()
@@ -129,7 +133,7 @@ class syncModeration {
 
     await interaction.editReply("Successfully toggled the ban!");
   }
-  
+
   @Slash({
     description: "Adds a Category.",
     guilds: ["932286006156222495", "995759386142179358"],
@@ -161,9 +165,9 @@ class syncModeration {
       category,
       interaction.member?.user!
     );
-      found.nsfw = nsfw === true;
-      found.description = description
-      await this.guildConfigService.saveCategory(found);
+    found.nsfw = nsfw === true;
+    found.description = description;
+    await this.guildConfigService.saveCategory(found);
     await interaction.editReply("Category successfully created!");
   }
 
