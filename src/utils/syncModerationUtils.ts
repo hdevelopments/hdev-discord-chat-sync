@@ -19,7 +19,11 @@ export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
   async sendToAllChannels(category: string, message: Message) {
-    if (!message.content || message.content.trim().length === 0) return;
+    if (
+      (!message.content || message.content.trim().length === 0) &&
+      message.stickers.size === 0
+    )
+      return;
     var foundCategory = await this.GuildConfig.findCategory(
       new ObjectID(category)
     );
@@ -54,21 +58,31 @@ export default class syncUtils {
       name: message.member?.nickname || message.author.username,
       iconURL: message.author.avatarURL() || undefined,
     });
+
     embed.setFooter({
       text: "From the Guild: " + message.guild?.name,
       iconURL: message.guild?.iconURL() || undefined,
     });
+
     embed.setColor((author.hexAccentColor as ColorResolvable) || "Blurple");
     embed.setTimestamp(Date.now());
+
     var isInBotCache = false;
-    var text = message.content;
-    var animatedemojis = message.content.matchAll(
+    var original = message.content || "";
+
+    if (original.trim().length === 0 && message.stickers.size > 0) {
+      message.stickers.forEach((x) => {
+        original += x.url + " \n ";
+      });
+    }
+
+    var text = original;
+
+    var animatedemojis = original.matchAll(
       /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
     );
-    var emojis = message.content.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
-    var urls = Array.from(
-      message.content.matchAll(/(http[s]?:\/\/([^ \n])*)/gim)
-    );
+    var emojis = original.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
+    var urls = Array.from(original.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
     for (let n of emojis) {
       let url = hyperlink(
         n[0],
@@ -204,9 +218,9 @@ export default class syncUtils {
               (message.member?.nickname || message.author.username) +
               ": " +
               message.content,
-            components:
-              (Boolean(guildConfig.configs["noButtons"]) && []) ||
-              [rowForGuild],
+            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+              rowForGuild,
+            ],
             allowedMentions: {
               repliedUser: false,
               parse: [],
