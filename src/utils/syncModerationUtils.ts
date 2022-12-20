@@ -56,7 +56,8 @@ export default class syncUtils {
 
     embed.setAuthor({
       name: message.member?.nickname || message.author.username,
-      iconURL: message.member?.avatarURL() || message.author.avatarURL() || undefined,
+      iconURL:
+        message.member?.avatarURL() || message.author.avatarURL() || undefined,
     });
 
     embed.setFooter({
@@ -69,6 +70,8 @@ export default class syncUtils {
 
     var isInBotCache = false;
     var original = message.content || "";
+
+    embed.setDescription(original);
 
     if (original.trim().length === 0 && message.stickers.size > 0) {
       message.stickers.forEach((x) => {
@@ -136,11 +139,13 @@ export default class syncUtils {
         return;
       }
       if (!channel) return;
+      var guildEmbed = embed;
+
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
-      if (embed.data.author && Boolean(guildConfig.configs["noButtons"])) {
-        embed.data.author.name += `( ${message.author.id} )`;
+      if (guildEmbed.data.author && Boolean(guildConfig.configs["noButtons"])) {
+        guildEmbed.data.author.name += `( ${message.author.id} )`;
       }
       if (
         urls.length > 0 &&
@@ -155,14 +160,14 @@ export default class syncUtils {
 
         rowForGuild.addComponents(links);
       }
+      guildEmbed.setDescription(text);
       if (
         guildConfig.configs["type"] !=
         "Webhook ( Small, it does need the Webhook permission! )"
       ) {
-        embed.setDescription(text);
         try {
           await channel.send({
-            embeds: [embed],
+            embeds: [guildEmbed],
             components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
               rowForGuild,
             ],
@@ -176,7 +181,7 @@ export default class syncUtils {
         } catch (exc: any) {
           console.log(exc);
           channel.send({
-            embeds: [embed],
+            embeds: [guildEmbed],
             components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
               row,
             ],
@@ -203,8 +208,15 @@ export default class syncUtils {
             components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
               rowForGuild,
             ],
-            username: message.member?.nickname || message.author.username,
-            avatarURL: message.member?.avatarURL() || message.author.avatarURL() || undefined,
+            username:
+              (message.member?.nickname || message.author.username) +
+              ((Boolean(guildConfig.configs["noButtons"]) &&
+                `( ${message.author.id} )`) ||
+                ""),
+            avatarURL:
+              message.member?.avatarURL() ||
+              message.author.avatarURL() ||
+              undefined,
             allowedMentions: {
               repliedUser: false,
               parse: [],
