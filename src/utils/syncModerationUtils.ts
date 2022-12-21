@@ -139,7 +139,7 @@ export default class syncUtils {
         return;
       }
       if (!channel) return;
-      var guildEmbed = embed;
+      var guildEmbed = new EmbedBuilder(embed.toJSON());
 
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
