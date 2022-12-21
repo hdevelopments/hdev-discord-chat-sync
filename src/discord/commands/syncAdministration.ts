@@ -1,39 +1,18 @@
 import {
-    ActionRowBuilder,
     ApplicationCommandOptionType,
     AutocompleteInteraction,
-    ChannelType,
     CommandInteraction,
-    EmbedBuilder,
-    GuildTextBasedChannel,
-    MessageActionRowComponentBuilder,
-    StringSelectMenuBuilder,
-    StringSelectMenuInteraction,
   } from "discord.js";
   import {
     Discord,
     Guard,
-    SelectMenuComponent,
     Slash,
-    SlashChoice,
-    SlashChoiceType,
     SlashGroup,
     SlashOption,
   } from "discordx";
-  import { ObjectID } from "ts-mongodb-orm";
   import { Inject } from "typedi";
   import GuildConfigService from "../../services/GuildConfigService";
   import { noDms } from "../guards/noDms";
-  
-  export const options: { [key: string]: string[] } = {
-    ["noInvites"]: ["True", "False"],
-    ["noEmbeddedLinks"]: ["True", "False"],
-    ["type"]: [
-      "Embed ( Big, Default )",
-      "Webhook ( Small, it does need the Webhook permission! )",
-    ],
-    ["noButtons"]: ["True", "False"],
-  };
   
   @Discord()
   @SlashGroup({
@@ -150,20 +129,6 @@ import {
   
       await this.guildConfigService.removeCategory(found);
       await interaction.editReply("Category successfully removed!");
-    }
-  
-    static optionCompleter(interaction: AutocompleteInteraction) {
-      var option = interaction.options.getString("option");
-      if (!option) {
-        interaction.respond([{ name: "please select a option!", value: "no" }]);
-        return;
-      }
-  
-      interaction.respond(
-        options[option].map((x) => {
-          return { name: x, value: x };
-        })
-      );
     }
   }
   

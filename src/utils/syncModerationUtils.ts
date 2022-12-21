@@ -144,7 +144,7 @@ export default class syncUtils {
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
-      if (guildEmbed.data.author && Boolean(guildConfig.configs["noButtons"])) {
+      if (guildEmbed.data.author && Boolean(guildConfig.configs["noButtons"]) === true) {
         guildEmbed.data.author.name += ` (${message.author.id})`;
       }
       if (
@@ -168,7 +168,7 @@ export default class syncUtils {
         try {
           await channel.send({
             embeds: [guildEmbed],
-            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+            components: (Boolean(guildConfig.configs["noButtons"] === true) && []) || [
               rowForGuild,
             ],
             allowedMentions: {
@@ -182,7 +182,7 @@ export default class syncUtils {
           console.log(exc);
           channel.send({
             embeds: [guildEmbed],
-            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+            components: (Boolean(guildConfig.configs["noButtons"] === true) && []) || [
               row,
             ],
             allowedMentions: {
@@ -205,12 +205,12 @@ export default class syncUtils {
             }));
           webhook.send({
             content: text,
-            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+            components: (Boolean(guildConfig.configs["noButtons"] === true) && []) || [
               rowForGuild,
             ],
             username:
               (message.member?.nickname || message.author.username) +
-              ((Boolean(guildConfig.configs["noButtons"]) &&
+              ((Boolean(guildConfig.configs["noButtons"] === true) &&
                 ` (${message.author.id})`) ||
                 ""),
             avatarURL:
@@ -230,7 +230,7 @@ export default class syncUtils {
               (message.member?.nickname || message.author.username) +
               ": " +
               message.content,
-            components: (Boolean(guildConfig.configs["noButtons"]) && []) || [
+            components: (Boolean(guildConfig.configs["noButtons"]  === true) && []) || [
               rowForGuild,
             ],
             allowedMentions: {
