@@ -145,7 +145,7 @@ export default class syncUtils {
         row
       );
       if (guildEmbed.data.author && Boolean(guildConfig.configs["noButtons"])) {
-        guildEmbed.data.author.name += `( ${message.author.id} )`;
+        guildEmbed.data.author.name += ` (${message.author.id})`;
       }
       if (
         urls.length > 0 &&
@@ -211,7 +211,7 @@ export default class syncUtils {
             username:
               (message.member?.nickname || message.author.username) +
               ((Boolean(guildConfig.configs["noButtons"]) &&
-                `( ${message.author.id} )`) ||
+                ` (${message.author.id})`) ||
                 ""),
             avatarURL:
               message.member?.avatarURL() ||
