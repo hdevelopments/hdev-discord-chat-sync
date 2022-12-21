@@ -85,7 +85,6 @@ export default class syncUtils {
       /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
     );
     var emojis = original.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
-    var urls = Array.from(original.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
     for (let n of emojis) {
       let url = hyperlink(
         n[0],
@@ -110,6 +109,7 @@ export default class syncUtils {
         text = text.replaceAll(n[0], url);
       }
     }
+    var urls = Array.from(text.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
 
     if (isInBotCache) {
       const customemojis = new ButtonBuilder()
