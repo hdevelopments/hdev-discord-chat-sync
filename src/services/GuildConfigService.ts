@@ -25,6 +25,7 @@ class GuildConfigService {
 
     return created;
   }
+
   async getOrCreateCategory(category: string, owner: User | APIUser | string) {
     var found = await this.GuildCategoryRepo.filterOne("name", (x) =>
       x.eq(category)
@@ -43,8 +44,21 @@ class GuildConfigService {
     return await this.GuildCategoryRepo.save(created);
   }
 
+  async getCategory(category: string) {
+    return await this.GuildCategoryRepo.filterOne("name", (x) =>
+      x.eq(category)
+    );
+  }
+
+  async getByCategoryId(categoryId: string) {
+    return await this.GuildCategoryRepo.filterOne("_id", (x) =>
+      x.eq(categoryId)
+    );
+  }
+
   async getByChannel(guild: string, channel: string) {
-    return (await this.GuildConfigRepo.filterOne("guild", x => x.exists()))?.channels[channel];
+    return (await this.GuildConfigRepo.filterOne("guild", (x) => x.exists()))
+      ?.channels[channel];
   }
 
   async findCategory(categoryId: ObjectID) {
@@ -60,20 +74,19 @@ class GuildConfigService {
   }
 
   async removeCategory(category: guildCategory) {
-    var channels = await this.getAllChannels()
-    channels.forEach(async guilds => {
-      let changed = false
-      Object.entries(guilds.channels).forEach(async channels =>{
-        if(channels[1].category === category._id.toString()){
-          changed = true
-          delete guilds.channels[channels[0]]
+    var channels = await this.getAllChannels();
+    channels.forEach(async (guilds) => {
+      let changed = false;
+      Object.entries(guilds.channels).forEach(async (channels) => {
+        if (channels[1].category === category._id.toString()) {
+          changed = true;
+          delete guilds.channels[channels[0]];
         }
-        if(changed){
-          await this.GuildConfigRepo.save(guilds)
+        if (changed) {
+          await this.GuildConfigRepo.save(guilds);
         }
-      })
-
-    })
+      });
+    });
     return await this.GuildCategoryRepo.removeOne(category);
   }
 
@@ -85,8 +98,14 @@ class GuildConfigService {
     return await this.GuildCategoryRepo.filterMany("_id", (x) => x.exists());
   }
 
-  async changeAllChannelsFromTo(oldCategory: string, newCategory: string){
-    console.log(await this.GuildConfigRepo.filterMany("channels.$all", x => x.exists(true), true))
+  async changeAllChannelsFromTo(oldCategory: string, newCategory: string) {
+    console.log(
+      await this.GuildConfigRepo.filterMany(
+        "channels.$all",
+        (x) => x.exists(true),
+        true
+      )
+    );
   }
 }
 

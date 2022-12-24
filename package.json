@@ -14,12 +14,12 @@
   "dependencies": {
     "@discordx/di": "^3.0.2",
     "@discordx/importer": "^1.1.10",
-    "@discordx/pagination": "^3.3.1",
-    "axios": "^1.2.0",
-    "discord.js": "^14.6.0",
-    "discordx": "^11.4.0",
+    "@discordx/pagination": "^3.4.0",
+    "axios": "^1.2.1",
+    "discord.js": "^14.7.1",
+    "discordx": "^11.5.2",
     "dotenv": "^16.0.3",
-    "mongodb": "^4.1.0",
+    "mongodb": "^4.13.0",
     "reflect-metadata": "^0.1.13",
     "ts-mongodb-orm": "^2.0.1",
     "ts-node": "^10.9.1",
@@ -28,9 +28,9 @@
   },
   "devDependencies": {
     "@types/mongodb": "^4.0.7",
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.11.17",
     "nodemon": "^2.0.20",
-    "prettier": "^2.7.1"
+    "prettier": "^2.8.1"
   },
   "engines": {
     "node": ">=16.0.0",

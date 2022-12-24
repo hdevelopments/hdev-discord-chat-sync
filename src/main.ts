@@ -37,8 +37,6 @@ export const bot = new Client({
   },
 });
 
-
-
 function syncActivities() {
   const activities = [
     {
@@ -47,12 +45,10 @@ function syncActivities() {
     {
       name: `Support: https://discord.gg/5Nxm6peEt4`,
     },
-  ]
+  ];
 
   bot.user?.setPresence({
-    activities: [
-      activities[Math.floor(Math.random() * activities.length) ]
-    ],
+    activities: [activities[Math.floor(Math.random() * activities.length)]],
   });
 }
 
@@ -60,6 +56,12 @@ bot.once("ready", async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
   // await bot.clearApplicationCommands();
+  // await bot.clearApplicationCommands(...[
+  //   "932286006156222495",
+  //   "995759386142179358",
+  //   "1045689302199312465",
+  // ]);
+
   // Synchronize applications commands with Discord
   try {
     await bot.initApplicationCommands();
@@ -77,6 +79,10 @@ bot.once("ready", async () => {
     await discords.syncUp();
   }, 30 * 60 * 1000);
   console.log("Bot started");
+});
+
+bot.on("messageReactionAdd", (reaction, user) => {
+  bot.executeReaction(reaction, user);
 });
 
 bot.on("interactionCreate", (interaction: Interaction) => {

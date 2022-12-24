@@ -13,6 +13,7 @@ import {
 import {
   Discord,
   Guard,
+  Guild,
   SelectMenuComponent,
   Slash,
   SlashChoice,
@@ -42,6 +43,7 @@ export const options: { [key: string]: string[] } = {
   dmPermission: false,
   defaultMemberPermissions: ["ManageChannels", "ManageMessages"],
 })
+@SlashGroup("moderation")
 @Guard(noDms)
 class syncModeration {
   @Inject()
@@ -50,7 +52,6 @@ class syncModeration {
   private setupData: { [key: string]: { channel: string } } = {};
 
   @Slash({ description: "Set the channel for chatting." })
-  @SlashGroup("moderation")
   async setchatchannel(
     @SlashOption({
       type: ApplicationCommandOptionType.Channel,
@@ -99,7 +100,7 @@ class syncModeration {
 
     // if value not found
     if (!category) {
-      return interaction.followUp("invalid Selection!, select again");
+      return interaction.editReply("invalid Selection!, select again");
     }
 
     var data = await this.guildConfigService.getOrCreate(interaction.guildId!);
@@ -120,7 +121,6 @@ class syncModeration {
   @Slash({
     description: "Shows you the information about this Channel.",
   })
-  @SlashGroup("moderation")
   async info(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     var found = await this.guildConfigService.getByChannel(
@@ -146,7 +146,6 @@ class syncModeration {
   @Slash({
     description: "Removes the current channel from being synced.",
   })
-  @SlashGroup("moderation")
   async remove(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     var foundchannel = await this.guildConfigService.getByChannel(
@@ -162,10 +161,10 @@ class syncModeration {
       await interaction.editReply({ content: "Failed" });
     }
   }
+
   @Slash({
     description: "Lets you set some options.",
   })
-  @SlashGroup("moderation")
   async set(
     @SlashChoice(
       ...Object.entries(options).map((data) => {
