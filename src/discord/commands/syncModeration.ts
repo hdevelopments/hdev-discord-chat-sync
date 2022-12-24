@@ -13,11 +13,9 @@ import {
 import {
   Discord,
   Guard,
-  Guild,
   SelectMenuComponent,
   Slash,
   SlashChoice,
-  SlashChoiceType,
   SlashGroup,
   SlashOption,
 } from "discordx";
@@ -70,7 +68,7 @@ class syncModeration {
     // create menu for roles
     const menu = new StringSelectMenuBuilder()
       .addOptions(
-        ...categories.map((x) => ({
+        ...categories.filter(x => !x.password).map((x) => ({
           label: x.name + (x.nsfw ? "(NSFW)" : ""),
           value: x._id.toString(),
           description: x.description,
