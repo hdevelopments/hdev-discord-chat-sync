@@ -65,11 +65,10 @@ bot.once("ready", async () => {
   // Synchronize applications commands with Discord
   try {
     await bot.initApplicationCommands();
-  } catch {
-    (exc: any) => {
-      console.log(exc.rawError);
-    };
+  } catch (exc: any) {
+    console.log(exc.rawError);
   }
+
   syncActivities();
   setInterval(() => {
     syncActivities();
