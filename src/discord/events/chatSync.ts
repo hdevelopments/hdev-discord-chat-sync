@@ -41,10 +41,13 @@ export class chatSync {
     }
 
     var config = await this.guildConfig.getOrCreate(message.guildId!);
-    if (config.banned || !config.channels) return;
+    if (!config || config.banned || !config.channels) return;
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
-      var phishingresult = await this.phishingService.checkForPhishing(message) 
+      var category = await this.guildConfig.getByCategoryId(
+        foundChannel.category
+      );
+      var phishingresult = await this.phishingService.checkForPhishing(message);
       if (phishingresult === true) {
         var logchannel = (await bot.channels.fetch(
           "1051147189243621477"
@@ -66,8 +69,8 @@ export class chatSync {
         return;
       }
       if (
+        category?.password &&
         config.guild !== "995759386142179358" &&
-        config.guild !== "952138215136055329" &&
         !config.vip &&
         Date.now() - (foundChannel.lastMessage || 0) < 500
       ) {
