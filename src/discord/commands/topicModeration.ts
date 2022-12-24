@@ -31,7 +31,7 @@ class topicModeration {
   @Slash({
     description: "Lets you join your custom Topic.",
   })
-  async jointopic(
+  async join(
     @SlashOption({
       description: "The Name of the topic you want to join",
       name: "topic",
