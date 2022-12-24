@@ -15,7 +15,6 @@ import {
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
-import { TextChange } from "typescript";
 
 @Discord()
 @SlashGroup({
@@ -24,7 +23,6 @@ import { TextChange } from "typescript";
   dmPermission: false,
   defaultMemberPermissions: ["ManageChannels", "ManageMessages"],
 })
-@Guild(["932286006156222495", "995759386142179358", "1045689302199312465"])
 @SlashGroup("topic")
 @Guard(noDms)
 class topicModeration {
