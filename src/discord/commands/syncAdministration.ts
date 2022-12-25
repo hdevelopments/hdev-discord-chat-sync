@@ -1,6 +1,5 @@
 import {
   ApplicationCommandOptionType,
-  AutocompleteInteraction,
   CommandInteraction,
 } from "discord.js";
 import {

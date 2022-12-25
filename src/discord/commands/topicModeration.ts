@@ -10,7 +10,6 @@ import {
   Guard,
   Slash,
   SlashOption,
-  Guild,
 } from "discordx";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
@@ -114,7 +113,7 @@ class topicModeration {
     description:
       "Lets you create your custom Topic (for your Own Server or so ;) ).",
   })
-  async createtopic(
+  async create(
     @SlashOption({
       description: "The Name of the topic you want to create",
       name: "topic",

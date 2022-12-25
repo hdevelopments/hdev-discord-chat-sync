@@ -1,4 +1,3 @@
-import { ArgsOf, Discord, On } from "discordx";
 import { Message, MessageType } from "discord.js";
 import axios from "axios";
 import phishingResponse from "../../models/db-models/Phishing";

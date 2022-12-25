@@ -68,11 +68,13 @@ class syncModeration {
     // create menu for roles
     const menu = new StringSelectMenuBuilder()
       .addOptions(
-        ...categories.filter(x => !x.password).map((x) => ({
-          label: x.name + (x.nsfw ? "(NSFW)" : ""),
-          value: x._id.toString(),
-          description: x.description,
-        }))
+        ...categories
+          .filter((x) => !x.password)
+          .map((x) => ({
+            label: x.name + (x.nsfw ? " (NSFW)" : ""),
+            value: x._id.toString(),
+            description: x.description + (x.nsfw ? " (possible NSFW)" : ""),
+          }))
       )
       .setCustomId("categories-menu");
     const row =

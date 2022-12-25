@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
-import { ActivityType, Interaction, Message, Partials } from "discord.js";
+import { Interaction, Message, Partials } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client, DIService, typeDiDependencyRegistryEngine } from "discordx";
 import Config from "./discordConfig";

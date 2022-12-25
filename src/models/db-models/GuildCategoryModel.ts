@@ -1,4 +1,4 @@
-import { Document, Field, ObjectId } from "ts-mongodb-orm";
+import { Document, Field } from "ts-mongodb-orm";
 import BaseModel from "./BaseModel";
 
 @Document({ collectionName: "guildCategory" })

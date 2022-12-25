@@ -41,7 +41,14 @@ export class chatSync {
     }
 
     var config = await this.guildConfig.getOrCreate(message.guildId!);
-    if (!config || config.banned || !config.channels) return;
+    if (
+      !config ||
+      config.banned ||
+      !config.channels ||
+      message.content.startsWith("/") ||
+      message.content.startsWith("!")
+    )
+      return;
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
       var category = await this.guildConfig.getByCategoryId(
