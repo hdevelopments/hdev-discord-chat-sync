@@ -68,27 +68,27 @@ export class Phishing {
     var links = Array.from(
       message.content.matchAll(/(http[s]?:\/\/([^ \n])*)/gim)
     );
-    if (links.length > 0) {
-      var promises: Promise<unknown>[] = [];
-      links.forEach((x) => {
-        var url = x[0].substring(x[0].toLowerCase().indexOf("://") + 3).trim();
+    if (links.length <= 0) return false;
 
-        url = url.substring(0, url.indexOf("/") || url.length);
+    var promises: Promise<unknown>[] = [];
+    links.forEach((x) => {
+      var url = x[0].substring(x[0].toLowerCase().indexOf("://") + 3).trim();
 
-        promises.push(this.check(url));
-      });
-      var result = await Promise.allSettled(promises);
+      url = url.substring(0, url.indexOf("/") || url.length);
 
-      try {
-        var values = result.flatMap((x) => x.status === "fulfilled" && x.value);
-        var found = values.find((data: any) => {
-          return (data as { result: boolean; url: string }).result;
-        }) as { result: boolean; url: string } | undefined;
-        return found !== undefined && found.result || false;
-      } catch (x) {
-        console.log(x);
-      }
+      promises.push(this.check(url));
+    });
+    var result = await Promise.allSettled(promises);
+
+    try {
+      var values = result.flatMap((x) => x.status === "fulfilled" && x.value);
+      var found = values.find((data: any) => {
+        return (data as { result: boolean; url: string }).result;
+      }) as { result: boolean; url: string } | undefined;
+      return found !== undefined && found.result || false;
+    } catch (x) {
+      console.log(x);
+      return false;
     }
-    return false;
   }
 }
