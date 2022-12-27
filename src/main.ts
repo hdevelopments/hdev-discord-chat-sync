@@ -9,6 +9,8 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import GuildConfigService from "./services/GuildConfigService";
 import { Typing } from "discord.js";
+import express from "express";
+import { apirouter } from "./express/api/api";
 
 var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
@@ -61,17 +63,6 @@ bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
 
-  (await guildConf.getAllChannels()).forEach((x) => {
-    Object.entries(x.channels).forEach(async (x) => {
-      try {
-        var guild = bot.guilds.cache.get(x[1].guild);
-        await guild?.channels.fetch(x[0], { force: true });
-      } catch (exc) {
-        console.log("error init");
-        console.log(exc);
-      }
-    });
-  });
   // await bot.clearApplicationCommands();
   // await bot.clearApplicationCommands(...[
   //   "932286006156222495",
@@ -143,4 +134,12 @@ async function run() {
   await bot.login(Config.Bot_Token);
 }
 run();
+
+var App = express();
+
+App.use("/api", apirouter);
+
+App.listen(3000);
+
 export default bot;
+export { App };
