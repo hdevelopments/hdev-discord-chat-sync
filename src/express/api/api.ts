@@ -40,15 +40,13 @@ router.get("/support", async (req, res) => {
   res.json({
     members: guild?.memberCount,
     online: guild?.members.cache.filter(
-      (x) =>
-        x.presence?.clientStatus?.desktop === "online" ||
-        x.presence?.clientStatus?.desktop === "dnd"
+      (x) => x.presence?.status === "online" || x.presence?.status === "dnd"
     ).size,
     idle: guild?.members.cache.filter(
-      (x) => x.presence?.clientStatus?.desktop === "idle"
+      (x) => x.presence?.status === "idle"
     ).size,
     offline: guild?.members.cache.filter(
-      (x) => !x.presence?.clientStatus?.desktop
+      (x) => !x.presence?.status || x.presence?.status === "offline" || x.presence?.status === "invisible"
     ).size,
   });
 });
