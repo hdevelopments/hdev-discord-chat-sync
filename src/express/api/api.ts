@@ -37,17 +37,18 @@ router.get("/channels", async (req, res) => {
 // define the about route
 router.get("/support", async (req, res) => {
   var guild = bot.guilds.cache.get("995759386142179358");
-  var members = await guild?.members.fetch({withPresences: true})
+  var members = await guild?.members.fetch({ withPresences: true });
   res.json({
     members: members?.size,
     online: members?.filter(
       (x) => x.presence?.status === "online" || x.presence?.status === "dnd"
     ).size,
-    idle: members?.filter(
-      (x) => x.presence?.status === "idle"
-    ).size,
+    idle: members?.filter((x) => x.presence?.status === "idle").size,
     offline: members?.filter(
-      (x) => !x.presence?.status || x.presence?.status === "offline" || x.presence?.status === "invisible"
+      (x) =>
+        !x.presence?.status ||
+        x.presence?.status === "offline" ||
+        x.presence?.status === "invisible"
     ).size,
   });
 });
