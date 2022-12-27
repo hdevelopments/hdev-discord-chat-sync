@@ -29,35 +29,29 @@ Discord Chat Sync is a Discord bot that syncs up channels between different serv
 
 You can invite the public instance of the bot by clicking [here](https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands).
 
-###### Permissions For The Public Bot
+#### Permissions For The Public Bot
 <details><summary><b>Embed Links</b></summary>
 This is required to sync links between servers
 </details>
-<br>
 <details><summary><b>External Emojis / Sticker</b></summary>
 This is required to sync emojis and stickers from other servers
 </details>
-<br>
+
 <details><summary><b>Attach Files</b></summary>
 In the future, this will allow the users to share files through the bot
 </details>
-<br>
 <details><summary><b>Add Reaction</b></summary>
 In the future, this will allow the bot to share reactions to messages and react to your message as a confirmation
 </details>
-<br>
 <details><summary><b>Read / Send Messages</b></summary>
 This is required for the core functions
 </details>
-<br>
 <details><summary><b>Send Messages in Threads</b></summary>
 In the future, this will allow to access/handle threads and their content
 </details>
-<br>
 <details><summary><b>Read message history</b></summary>
 In the future, this will allow the bot to sync messages when setting up in a new server
 </details>
-<br>
 
 ## Links To The Bot:
 
