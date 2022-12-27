@@ -36,13 +36,21 @@ router.get("/channels", async (req, res) => {
 
 // define the about route
 router.get("/support", async (req, res) => {
-    var guild = bot.guilds.cache.get("995759386142179358")
-    res.json({
-      members: guild?.memberCount,
-      online: guild?.members.cache.filter(x => x.presence?.clientStatus?.desktop === "online" || x.presence?.clientStatus?.desktop === "dnd"),
-      idle: guild?.members.cache.filter(x => x.presence?.clientStatus?.desktop === "idle"),
-      offline: guild?.members.cache.filter(x => !x.presence?.clientStatus?.desktop)
-    });
+  var guild = bot.guilds.cache.get("995759386142179358");
+  res.json({
+    members: guild?.memberCount,
+    online: guild?.members.cache.filter(
+      (x) =>
+        x.presence?.clientStatus?.desktop === "online" ||
+        x.presence?.clientStatus?.desktop === "dnd"
+    ).size,
+    idle: guild?.members.cache.filter(
+      (x) => x.presence?.clientStatus?.desktop === "idle"
+    ).size,
+    offline: guild?.members.cache.filter(
+      (x) => !x.presence?.clientStatus?.desktop
+    ).size,
   });
+});
 
 export { router as apirouter };
