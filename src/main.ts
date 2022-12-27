@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
-import { Interaction, Message, Partials } from "discord.js";
+import { Interaction, Message, Partials, Events } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client, DIService, typeDiDependencyRegistryEngine } from "discordx";
 import Config from "./discordConfig";
@@ -52,7 +52,7 @@ function syncActivities() {
   });
 }
 
-bot.once("ready", async () => {
+bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
   // await bot.clearApplicationCommands();
@@ -80,11 +80,11 @@ bot.once("ready", async () => {
   console.log("Bot started");
 });
 
-bot.on("messageReactionAdd", (reaction, user) => {
+bot.on(Events.MessageReactionAdd, (reaction, user) => {
   bot.executeReaction(reaction, user);
 });
 
-bot.on("interactionCreate", (interaction: Interaction) => {
+bot.on(Events.InteractionCreate, (interaction: Interaction) => {
   try {
     // do not execute interaction, if it's pagination (avoid warning: select-menu/button interaction not found)
     if (interaction.isButton() || interaction.isStringSelectMenu()) {
@@ -99,7 +99,7 @@ bot.on("interactionCreate", (interaction: Interaction) => {
   }
 });
 
-bot.on("messageCreate", (message: Message) => {
+bot.on(Events.MessageCreate, (message: Message) => {
   try {
     bot.executeCommand(message);
   } catch (exc) {
