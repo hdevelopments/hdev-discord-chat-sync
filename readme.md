@@ -1,3 +1,6 @@
+[![badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fdynamic-badge-formatter-ynrxn78r2oye.runkit.sh%2Fjson%3Furl%3Dhttp%253A%252F%252F134.255.253.20%253A3000%252Fapi%252Fservers%26query%3D%2524.servers%26formatter%3Dmetric%26label%3DServers%2520connected%26logo%3Ddiscord%26logoWidth%3D18%26style%3Dfor-the-badge%26cacheSeconds%3D900%26prefix%3D%253D%253E%26suffix%3D%253C%253D)](https://discord.com/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands)
+[![badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fdynamic-badge-formatter-ynrxn78r2oye.runkit.sh%2Fjson%3Furl%3Dhttp%253A%252F%252F134.255.253.20%253A3000%252Fapi%252Fchannels%26query%3D%2524.channels%26formatter%3Dmetric%26label%3DChannels%2520connected%26logo%3Ddiscord%26logoWidth%3D18%26style%3Dfor-the-badge%26cacheSeconds%3D900%26prefix%3D%253D%253E%26suffix%3D%253C%253D)](https://discord.com/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands)
+
 # Support Discord:
 
 https://discord.gg/2vCVBnhSky
