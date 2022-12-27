@@ -9,6 +9,7 @@ import {
   TextBasedChannel,
   TextInputBuilder,
   TextInputStyle,
+  Events,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
@@ -23,8 +24,8 @@ export class chatSync {
   @Inject()
   private syncUtils: syncUtils;
 
-  @On({ event: "messageCreate", priority: 1 })
-  async handler([message]: ArgsOf<"messageCreate">): Promise<void> {
+  @On({ event: Events.MessageCreate, priority: 1 })
+  async handler([message]: ArgsOf<Events.MessageCreate>): Promise<void> {
     if (
       !message.inGuild() ||
       !message.author ||
@@ -47,53 +48,53 @@ export class chatSync {
       !config.channels ||
       message.content.startsWith("/") ||
       message.content.startsWith("!")
-    )
+    ) {
       return;
-    var foundChannel = config.channels[message.channelId];
-    if (foundChannel) {
-      var category = await this.guildConfig.getByCategoryId(
-        foundChannel.category
-      );
-      var phishingresult = await this.phishingService.checkForPhishing(message);
-      if (phishingresult === true) {
-        var logchannel = (await bot.channels.fetch(
-          "1051147189243621477"
-        )) as TextBasedChannel;
-
-        logchannel.send(
-          `Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${
-            message.content
-          }>||\nGuild: ${message.guild.toString()}-${message.guildId}`
-        );
-        await message.channel.send(
-          `${message.author.toString()} Phishing Link detected!`
-        );
-        if (message.deletable) {
-          message.delete().catch((x) => {
-            //ignore
-          });
-        }
-        return;
-      }
-      if (
-        category?.password &&
-        config.guild !== "995759386142179358" &&
-        !config.vip &&
-        Date.now() - (foundChannel.lastMessage || 0) < 500
-      ) {
-        message.channel
-          .send("Toooooo fast cowboy! (" + message.author.toString() + ")")
-          .then((x) => {
-            setTimeout(() => {
-              x.delete().catch((x) => {});
-            }, 5000);
-          });
-        return;
-      }
-      await this.syncUtils.sendToAllChannels(foundChannel.category, message);
-      foundChannel.lastMessage = Date.now();
-      this.guildConfig.save(config);
     }
+
+    var foundChannel = config.channels[message.channelId];
+    if (!foundChannel) return;
+  
+    var category = await this.guildConfig.getByCategoryId(foundChannel.category);
+    var phishingresult = await this.phishingService.checkForPhishing(message);
+    if (phishingresult === true) {
+      var logchannel = (await bot.channels.fetch(
+        "1051147189243621477"
+      )) as TextBasedChannel;
+
+      logchannel.send(
+        `Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${
+          message.content
+        }>||\nGuild: ${message.guild.toString()}-${message.guildId}`
+      );
+      await message.channel.send(
+        `${message.author.toString()} Phishing Link detected!`
+      );
+      if (message.deletable) {
+        message.delete().catch((x) => {
+          //ignore
+        });
+      }
+      return;
+    }
+    if (
+      category?.password &&
+      config.guild !== "995759386142179358" &&
+      !config.vip &&
+      Date.now() - (foundChannel.lastMessage || 0) < 500
+    ) {
+      message.channel
+        .send("Toooooo fast cowboy! (" + message.author.toString() + ")")
+        .then((x) => {
+          setTimeout(() => {
+            x.delete().catch((x) => {});
+          }, 5000);
+        });
+      return;
+    }
+    await this.syncUtils.sendToAllChannels(foundChannel.category, message);
+    foundChannel.lastMessage = Date.now();
+    this.guildConfig.save(config);
   }
   delayTyping = 0
   @On({ event: "typingStart" })
