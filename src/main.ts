@@ -40,7 +40,7 @@ export const bot = new Client({
 });
 bot.on("typingStart", (typing: Typing) => {
   // console.log(typing)
-})
+});
 function syncActivities() {
   const activities = [
     {
@@ -57,7 +57,6 @@ function syncActivities() {
 }
 var guildConf = typeDiDependencyRegistryEngine.getService(GuildConfigService)!;
 
-
 bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
@@ -66,7 +65,7 @@ bot.once(Events.ClientReady, async () => {
     Object.entries(x.channels).forEach(async (x) => {
       try {
         var guild = bot.guilds.cache.get(x[1].guild);
-        guild?.channels.fetch(x[0], { force: true });
+        await guild?.channels.fetch(x[0], { force: true });
       } catch (exc) {
         console.log("error init");
         console.log(exc);
