@@ -47,8 +47,10 @@ export class chatSync {
       !config.channels ||
       message.content.startsWith("/") ||
       message.content.startsWith("!")
-    )
+    ) {
       return;
+    }
+
     var foundChannel = config.channels[message.channelId];
     if (foundChannel) {
       var category = await this.guildConfig.getByCategoryId(
