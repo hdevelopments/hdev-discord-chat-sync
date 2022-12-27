@@ -7,6 +7,8 @@ import Config from "./discordConfig";
 import { NoBot } from "./discord/guards/noBots";
 import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
+import GuildConfigService from "./services/GuildConfigService";
+import { Typing } from "discord.js";
 
 var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
@@ -20,12 +22,12 @@ export const bot = new Client({
     IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
-    IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.GuildPresences,
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.DirectMessageTyping,
     IntentsBitField.Flags.DirectMessages,
+    IntentsBitField.Flags.GuildMessageTyping,
   ],
   partials: [Partials.Channel],
   // Debug logs are disabled in silent mode
@@ -36,7 +38,9 @@ export const bot = new Client({
     prefix: "!",
   },
 });
-
+bot.on("typingStart", (typing: Typing) => {
+  // console.log(typing)
+})
 function syncActivities() {
   const activities = [
     {
@@ -51,10 +55,24 @@ function syncActivities() {
     activities: [activities[Math.floor(Math.random() * activities.length)]],
   });
 }
+var guildConf = typeDiDependencyRegistryEngine.getService(GuildConfigService)!;
+
 
 bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
+
+  (await guildConf.getAllChannels()).forEach((x) => {
+    Object.entries(x.channels).forEach(async (x) => {
+      try {
+        var guild = bot.guilds.cache.get(x[1].guild);
+        guild?.channels.fetch(x[0], { force: true });
+      } catch (exc) {
+        console.log("error init");
+        console.log(exc);
+      }
+    });
+  });
   // await bot.clearApplicationCommands();
   // await bot.clearApplicationCommands(...[
   //   "932286006156222495",
