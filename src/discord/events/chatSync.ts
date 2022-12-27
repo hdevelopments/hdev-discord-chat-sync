@@ -95,6 +95,30 @@ export class chatSync {
       this.guildConfig.save(config);
     }
   }
+  delayTyping = 0
+  @On({ event: "typingStart" })
+  async sendTyping([typing]: ArgsOf<"typingStart">) {
+    if (!typing.inGuild() || this.delayTyping > Date.now()) return;
+    this.delayTyping += Date.now() + 5000
+    var channelcfg = await this.guildConfig.getByChannel(
+      typing.guild?.id!,
+      typing.channel.id
+    );
+    if (!channelcfg) return;
+    try {
+      (await this.guildConfig.getAllChannels()).forEach((x) => {
+        Object.entries(x.channels).forEach((x) => {
+          bot.channels.fetch(x[0]).then(async (channel) => {
+            if (channel?.isTextBased && channel.id !== typing.channel.id) {
+              await (channel as TextBasedChannel).sendTyping();
+            }
+          });
+        });
+      });
+    } catch (exc) {
+      console.error(exc)
+    }
+  }
 
   @ButtonComponent({ id: /details-(\d+)-(\d+)/ })
   async doDetails(interaction: ButtonInteraction) {
