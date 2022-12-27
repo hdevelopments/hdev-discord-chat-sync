@@ -1,3 +1,7 @@
+# Support Discord:
+
+https://discord.gg/2vCVBnhSky
+
 # Discord Chat Sync
 
 Discord Chat Sync is a Discord bot that syncs up channels between different servers and allows for secure communication between them.
