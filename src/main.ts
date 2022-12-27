@@ -7,7 +7,6 @@ import Config from "./discordConfig";
 import { NoBot } from "./discord/guards/noBots";
 import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
-import GuildConfigService from "./services/GuildConfigService";
 import { Typing } from "discord.js";
 import express from "express";
 import { apirouter } from "./express/api/api";
