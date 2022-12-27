@@ -57,8 +57,6 @@ function syncActivities() {
     activities: [activities[Math.floor(Math.random() * activities.length)]],
   });
 }
-var guildConf = typeDiDependencyRegistryEngine.getService(GuildConfigService)!;
-
 bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
   await bot.guilds.fetch();
