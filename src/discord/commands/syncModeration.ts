@@ -73,7 +73,7 @@ class syncModeration {
           .map((x) => ({
             label: x.name + (x.nsfw ? " (NSFW)" : ""),
             value: x._id.toString(),
-            description: x.description + (x.nsfw ? " (possible NSFW)" : ""),
+            description: x.description && x.description + (x.nsfw ? " (possible NSFW)" : ""),
           }))
       )
       .setCustomId("categories-menu");
