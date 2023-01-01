@@ -2,15 +2,19 @@ import { Service } from "typedi";
 import snoowrap from "snoowrap";
 import { Listing, ListingOptions, Submission } from "snoowrap/dist/objects";
 import { EmbedBuilder } from "@discordjs/builders";
-import { AttachmentBuilder, CommandInteraction, InteractionEditReplyOptions } from "discord.js";
+import {
+  AttachmentBuilder,
+  CommandInteraction,
+  InteractionEditReplyOptions,
+} from "discord.js";
 @Service()
 class redditService {
   private snoowrap = new snoowrap({
     userAgent:
       "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
-      clientId: "mr8WfLEWbTt3y2oFEvUrAg",
-      clientSecret: process.env.REDDIT_CLIENT_SECRET,
-      refreshToken: process.env.REDDIT_REFRESH_TOKEN
+    clientId: "mr8WfLEWbTt3y2oFEvUrAg",
+    clientSecret: process.env.REDDIT_CLIENT_SECRET,
+    refreshToken: process.env.REDDIT_REFRESH_TOKEN,
   });
 
   async fetch(
@@ -81,7 +85,10 @@ class redditService {
       name: data.author.name,
       url: "https://www.reddit.com/user/" + data.author.name,
     });
-    embed.setFooter({text: `Found by: ${inter.member?.user.username}@${inter.member?.user.discriminator} | ${inter.member?.user.id}`, iconURL: inter.user.avatarURL() || undefined})
+    embed.setFooter({
+      text: `Found by: ${inter.member?.user.username}@${inter.member?.user.discriminator} | ${inter.member?.user.id}`,
+      iconURL: inter.user.avatarURL() || undefined,
+    });
     if (data.is_video) {
       if (data.media?.reddit_video?.is_gif) {
         embed.setImage(data.media?.reddit_video?.fallback_url || null);
