@@ -8,6 +8,7 @@ import {
   hyperlink,
   Message,
   MessageActionRowComponentBuilder,
+  MessageCreateOptions,
 } from "discord.js";
 import { ObjectID } from "ts-mongodb-orm";
 import { Inject, Service } from "typedi";
@@ -18,15 +19,11 @@ import GuildConfigService from "../services/GuildConfigService";
 export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
-  async sendToAllChannels(category: string, message: Message) {
-    if (
-      (!message.content || message.content.trim().length === 0) &&
-      message.stickers.size === 0
-    )
-      return;
-    var foundCategory = await this.GuildConfig.findCategory(
-      new ObjectID(category)
-    );
+  async sendToAllChannels(
+    category: string,
+    message: Message | MessageCreateOptions
+  ) {
+    var row: ActionRowBuilder<MessageActionRowComponentBuilder>;
     var allGuilds = await this.GuildConfig.getAllChannels();
     var allChannels = allGuilds
       .filter((x) => !x.banned)
@@ -35,95 +32,107 @@ export default class syncUtils {
           .filter((x) => x[1].category === category)
           .map((x) => x[1])
       );
-    const guildBtn = new ButtonBuilder()
-      .setLabel("Details")
-      .setEmoji("👋")
-      .setStyle(ButtonStyle.Secondary)
-      .setCustomId("details-" + message.channelId + "-" + message.id);
-    const categoryBtn = new ButtonBuilder()
-      .setLabel(foundCategory?.name || "No Category")
-      .setStyle(ButtonStyle.Secondary)
-      .setCustomId("details-category")
-      .setDisabled(true);
-    const row =
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        guildBtn,
-        categoryBtn
+    if ("member" in message) {
+      if (
+        (!message.content || message.content.trim().length === 0) &&
+        message.stickers.size === 0
+      )
+        return;
+      var foundCategory = await this.GuildConfig.findCategory(
+        new ObjectID(category)
       );
-    var author = await message.author.fetch(true);
 
-    var embed = new EmbedBuilder();
-
-    embed.setAuthor({
-      name: message.member?.nickname || message.author.username,
-      iconURL:
-        message.member?.avatarURL() ||
-        message.author.avatarURL() ||
-        message.author.defaultAvatarURL ||
-        undefined,
-    });
-
-    embed.setFooter({
-      text: "From the Guild: " + message.guild?.name,
-      iconURL: message.guild?.iconURL() || undefined,
-    });
-
-    embed.setColor((author.hexAccentColor as ColorResolvable) || "Blurple");
-    embed.setTimestamp(Date.now());
-
-    var isInBotCache = false;
-    var original = message.content || "";
-
-    embed.setDescription(original);
-
-    if (original.trim().length === 0 && message.stickers.size > 0) {
-      message.stickers.forEach((x) => {
-        original += x.url + " \n ";
-      });
-    }
-
-    var text = original;
-
-    var animatedemojis = original.matchAll(
-      /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
-    );
-    var emojis = original.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
-    for (let n of emojis) {
-      let url = hyperlink(
-        n[0],
-        "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
-        "The custom Emote"
-      );
-      if (bot.emojis.cache.get(n[1])) {
-        isInBotCache = true;
-      } else {
-        text = text.replaceAll(n[0], url);
-      }
-    }
-    for (let n of animatedemojis) {
-      let url = hyperlink(
-        n[0],
-        "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
-        "The custom Emote"
-      );
-      if (bot.emojis.cache.get(n[1])) {
-        isInBotCache = true;
-      } else {
-        text = text.replaceAll(n[0], url);
-      }
-    }
-    var urls = Array.from(text.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
-
-    if (isInBotCache) {
-      const customemojis = new ButtonBuilder()
-        .setLabel("Some Emojis are custom!")
-        .setStyle(ButtonStyle.Primary)
-        .setCustomId("details-customemojis")
+      const guildBtn = new ButtonBuilder()
+        .setLabel("Details")
+        .setEmoji("👋")
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId("details-" + message.channelId + "-" + message.id);
+      const categoryBtn = new ButtonBuilder()
+        .setLabel(foundCategory?.name || "No Category")
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId("details-category")
         .setDisabled(true);
-      row.addComponents(customemojis);
+      row =
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          guildBtn,
+          categoryBtn
+        );
+      var author = await message.author.fetch(true);
+      var embed = new EmbedBuilder();
+
+      embed.setAuthor({
+        name: message.member?.nickname || message.author.username,
+        iconURL:
+          message.member?.avatarURL() ||
+          message.author.avatarURL() ||
+          message.author.defaultAvatarURL ||
+          undefined,
+      });
+
+      embed.setFooter({
+        text: "From the Guild: " + message.guild?.name,
+        iconURL: message.guild?.iconURL() || undefined,
+      });
+
+      embed.setColor((author.hexAccentColor as ColorResolvable) || "Blurple");
+      embed.setTimestamp(Date.now());
+
+      var isInBotCache = false;
+      var original = message.content || "";
+
+      embed.setDescription(original);
+
+      if (original.trim().length === 0 && message.stickers.size > 0) {
+        message.stickers.forEach((x) => {
+          original += x.url + " \n ";
+        });
+      }
+
+      var text = original;
+
+      var animatedemojis = original.matchAll(
+        /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
+      );
+      var emojis = original.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
+      for (let n of emojis) {
+        let url = hyperlink(
+          n[0],
+          "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
+          "The custom Emote"
+        );
+        if (bot.emojis.cache.get(n[1])) {
+          isInBotCache = true;
+        } else {
+          text = text.replaceAll(n[0], url);
+        }
+      }
+      for (let n of animatedemojis) {
+        let url = hyperlink(
+          n[0],
+          "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
+          "The custom Emote"
+        );
+        if (bot.emojis.cache.get(n[1])) {
+          isInBotCache = true;
+        } else {
+          text = text.replaceAll(n[0], url);
+        }
+      }
+      var urls = Array.from(text.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
+
+      if (isInBotCache) {
+        const customemojis = new ButtonBuilder()
+          .setLabel("Some Emojis are custom!")
+          .setStyle(ButtonStyle.Primary)
+          .setCustomId("details-customemojis")
+          .setDisabled(true);
+        row.addComponents(customemojis);
+      }
     }
+
     allChannels.forEach(async (x, i) => {
-      if (!x.channel || x.channel === message.channelId) return;
+  
+      if (!x.channel || ("member" in message) && x.channel === message.channelId) return;
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       var channel: BaseGuildTextChannel;
       try {
@@ -142,6 +151,10 @@ export default class syncUtils {
         return;
       }
       if (!channel) return;
+      if(!("member" in message)){
+        await channel.send(message)
+        return
+      }
       var guildEmbed = new EmbedBuilder(embed.toJSON());
 
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(

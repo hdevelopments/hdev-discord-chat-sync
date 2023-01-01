@@ -10,6 +10,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
   Events,
+  Message,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
