@@ -137,6 +137,7 @@ class getMemes {
 
   @ButtonComponent({ id: "share-meme" })
   async shareMeme(interaction: ButtonInteraction) {
+    await interaction.deferReply({ephemeral: true})
     this.syncUtils.sendToAllChannels(
       process.env.DEV ? "638f1ec83eeb0d2604999746" : "638f458e96954066bca89e10",
       {
@@ -144,5 +145,6 @@ class getMemes {
         attachments: interaction.message.attachments,
       }
     );
+    await interaction.editReply("Successfully shared!")
   }
 }

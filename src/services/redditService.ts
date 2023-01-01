@@ -72,15 +72,14 @@ class redditService {
   async createMessagePayload(inter: CommandInteraction, data: Submission) {
     var payload: InteractionEditReplyOptions = {};
     var embed = new EmbedBuilder();
-    embed.setTitle(data.title);
+    embed.setTitle("**Score: " +
+    data.ups +
+    "\nUpvote Ratio: " +
+    data.upvote_ratio * 100 +
+    "%**");
     embed.setURL("https://www.reddit.com" + data.permalink);
-    embed.setDescription(
-      "**Score: " +
-        data.ups +
-        "\nUpvote Ratio: " +
-        data.upvote_ratio * 100 +
-        "%**"
-    );
+    embed.addFields({name: "Title:", value: data.title})
+    
     embed.setAuthor({
       name: data.author.name,
       url: "https://www.reddit.com/user/" + data.author.name,
