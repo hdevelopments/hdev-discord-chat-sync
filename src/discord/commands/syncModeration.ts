@@ -23,6 +23,7 @@ import { ObjectID } from "ts-mongodb-orm";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
+import syncUtils from "../../utils/syncModerationUtils";
 
 export const options: { [key: string]: string[] } = {
   ["noInvites"]: ["True", "False"],
@@ -46,10 +47,16 @@ export const options: { [key: string]: string[] } = {
 class syncModeration {
   @Inject()
   private guildConfigService: GuildConfigService;
-
+  @Inject()
+  private syncUtils: syncUtils;
+  
   private setupData: { [key: string]: { channel: string } } = {};
 
-  @Slash({ description: "Set the channel for chatting." })
+  @Slash({
+    description: "Set the channel for chatting.",
+    dmPermission: false,
+    name: "setchannel",
+  })
   async setchatchannel(
     @SlashOption({
       type: ApplicationCommandOptionType.Channel,
@@ -115,6 +122,8 @@ class syncModeration {
       lastMessage: Date.now(),
     };
     await this.guildConfigService.save(data);
+
+    await this.syncUtils.sendToAllChannels(category, {content: interaction.guild?.name + " joined the chat!"})
 
     await interaction.editReply("Success!");
     return;
