@@ -123,7 +123,7 @@ class syncModeration {
     };
     await this.guildConfigService.save(data);
 
-    await this.syncUtils.sendToAllChannels(category, {content: interaction.guild?.name + " joined the chat!"})
+    await this.syncUtils.sendToAllChannels(category, {content: "**" + interaction.guild?.name + "** joined the chat!"})
 
     await interaction.editReply("Success!");
     return;
