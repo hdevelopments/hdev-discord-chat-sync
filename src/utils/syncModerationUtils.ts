@@ -44,7 +44,7 @@ export default class syncUtils {
 
       const guildBtn = new ButtonBuilder()
         .setLabel("Details")
-        .setEmoji("👋")
+        .setEmoji("ℹ️")
         .setStyle(ButtonStyle.Secondary)
         .setCustomId("details-" + message.channelId + "-" + message.id);
       const categoryBtn = new ButtonBuilder()
