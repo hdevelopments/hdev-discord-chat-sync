@@ -7,6 +7,7 @@ import {
   CommandInteraction,
   InteractionEditReplyOptions,
 } from "discord.js";
+
 @Service()
 class redditService {
   private snoowrap = new snoowrap({
@@ -72,14 +73,16 @@ class redditService {
   async createMessagePayload(inter: CommandInteraction, data: Submission) {
     var payload: InteractionEditReplyOptions = {};
     var embed = new EmbedBuilder();
-    embed.setTitle("**Score: " +
-    data.ups +
-    "\nUpvote Ratio: " +
-    data.upvote_ratio * 100 +
-    "%**");
+    embed.setTitle(
+      "**Score: " +
+        data.ups +
+        "\nUpvote Ratio: " +
+        data.upvote_ratio * 100 +
+        "%**"
+    );
     embed.setURL("https://www.reddit.com" + data.permalink);
-    embed.addFields({name: "Title:", value: data.title})
-    
+    embed.addFields({ name: "Title:", value: data.title });
+
     embed.setAuthor({
       name: data.author.name,
       url: "https://www.reddit.com/user/" + data.author.name,

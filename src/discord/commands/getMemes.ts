@@ -1,12 +1,11 @@
 import {
   ActionRowBuilder,
   ApplicationCommandOptionType,
-  AttachmentBuilder,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  Collection,
   CommandInteraction,
-  EmbedBuilder,
   InteractionEditReplyOptions,
   MessageActionRowComponentBuilder,
 } from "discord.js";
@@ -24,9 +23,7 @@ import { noDms } from "../guards/noDms";
 import redditService from "../../services/redditService";
 import { Listing, Submission } from "snoowrap";
 import Cache from "timed-cache";
-import GuildConfigService from "../../services/GuildConfigService";
 import syncUtils from "../../utils/syncModerationUtils";
-import Config from "../../discordConfig";
 
 @Discord()
 @SlashGroup({
@@ -40,10 +37,9 @@ class getMemes {
   @Inject()
   private redditService: redditService;
   @Inject()
-  private guildConfigService: GuildConfigService;
-  @Inject()
   private syncUtils: syncUtils;
   private memeCache = new Cache({ defaultTtl: 120 * 1000 });
+  private lastMeme: Collection<string, string> = new Collection();
   @Slash({
     description:
       "Lets you get a random post out of the Subreddit (default = dankmemes).",
@@ -87,12 +83,16 @@ class getMemes {
 
     if (refresh) {
       this.memeCache.put(subreddit, false);
+      this.lastMeme.delete(subreddit);
     }
     try {
       var data: Listing<Submission> | undefined;
       var payload: InteractionEditReplyOptions = {};
       if (!this.memeCache.get(subreddit + "-" + type)) {
-        data = await this.redditService.fetch(type, subreddit, { count: 5 });
+        data = await this.redditService.fetch(type, subreddit, {
+          count: 5,
+          before: this.lastMeme.get(subreddit),
+        });
         if (!data) {
           interaction.editReply("Something went wrong!");
           return;
@@ -105,6 +105,8 @@ class getMemes {
         ) as Listing<Submission>;
       }
       var firstData = data[0];
+
+      this.lastMeme.set(subreddit, firstData.name);
 
       payload = await this.redditService.createMessagePayload(
         interaction,
@@ -137,7 +139,7 @@ class getMemes {
 
   @ButtonComponent({ id: "share-meme" })
   async shareMeme(interaction: ButtonInteraction) {
-    await interaction.deferReply({ephemeral: true})
+    await interaction.deferReply({ ephemeral: true });
     this.syncUtils.sendToAllChannels(
       process.env.DEV ? "638f1ec83eeb0d2604999746" : "638f458e96954066bca89e10",
       {
@@ -145,6 +147,6 @@ class getMemes {
         attachments: interaction.message.attachments,
       }
     );
-    await interaction.editReply("Successfully shared!")
+    await interaction.editReply("Successfully shared!");
   }
 }
