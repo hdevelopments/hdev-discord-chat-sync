@@ -14,6 +14,7 @@ Discord Chat Sync is a Discord bot that syncs up channels between different serv
  * Cross server communication
  * In Private Topics you can Block servers
  * Anti phishing included
+ * Get Reddit Memes and share it to the Meme Topic :)
 
 ## Dependencies
 
