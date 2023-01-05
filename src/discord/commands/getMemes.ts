@@ -143,6 +143,7 @@ class getMemes {
     this.syncUtils.sendToAllChannels(
       process.env.DEV ? "638f1ec83eeb0d2604999746" : "638f458e96954066bca89e10",
       {
+        content: interaction.message.content,
         embeds: interaction.message.embeds,
         attachments: interaction.message.attachments,
       }
