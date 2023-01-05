@@ -7,11 +7,7 @@ import {
   EmbedBuilder,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import {
-  Discord,
-  Guard,
-  Slash,
-} from "discordx";
+import { Discord, Guard, Slash } from "discordx";
 import { noDms } from "../guards/noDms";
 import bot from "../../main";
 
@@ -48,6 +44,25 @@ class infoCommand {
     });
     embed.addFields({ name: "Ping", value: String(bot.ws.ping) + "ms" });
 
+    var embedTwo = new EmbedBuilder();
+
+    embedTwo.setAuthor({
+      name: interaction.user.username,
+      iconURL: interaction.user.avatarURL() || undefined,
+    });
+    embedTwo.setColor(Colors.Green);
+
+    embedTwo.addFields({
+      name: "How to Start",
+      value:
+        "> You can start syncing a chat Channel with:\n> **`/moderation setchannel channel:yourchannel`**\n> and then select your wanted topic!",
+    });
+    embedTwo.addFields({
+      name: "Create a private Topic",
+      value:
+        "> You can easily create your private Topic with:\n> **`/topic create topic:mytopic password:1234`**\n> and then Join it on another or the same Server with: \n> **`/topic join topic:mytopic password:1234 channel:mychannel`**",
+    });
+
     const shareBtn = new ButtonBuilder()
       .setLabel("Invite the Bot!")
       .setStyle(ButtonStyle.Link)
@@ -58,6 +73,6 @@ class infoCommand {
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         shareBtn
       );
-    await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed, embedTwo], components: [row] });
   }
 }
