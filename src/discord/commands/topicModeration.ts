@@ -4,13 +4,7 @@ import {
   CommandInteraction,
   TextChannel,
 } from "discord.js";
-import {
-  Discord,
-  SlashGroup,
-  Guard,
-  Slash,
-  SlashOption,
-} from "discordx";
+import { Discord, SlashGroup, Guard, Slash, SlashOption } from "discordx";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
@@ -50,7 +44,7 @@ class topicModeration {
       name: "channel",
       type: ApplicationCommandOptionType.Channel,
       required: true,
-      channelTypes: [ChannelType.GuildText],
+      channelTypes: [ChannelType.GuildText, ChannelType.GuildAnnouncement],
     })
     channel: TextChannel,
     interaction: CommandInteraction

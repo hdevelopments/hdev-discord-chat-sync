@@ -62,7 +62,7 @@ class syncModeration {
       type: ApplicationCommandOptionType.Channel,
       description: "The Channel",
       name: "channel",
-      channelTypes: [ChannelType.GuildText],
+      channelTypes: [ChannelType.GuildText, ChannelType.GuildAnnouncement],
       required: true,
     })
     channel: GuildTextBasedChannel,
