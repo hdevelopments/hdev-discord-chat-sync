@@ -5,6 +5,7 @@ import guildCategory from "../models/db-models/GuildCategoryModel";
 import guildConfig from "../models/db-models/GuildConfigModel";
 import GuildCategoryRepo from "../repositories/GuildCategoryRepo";
 import GuildConfigRepo from "../repositories/GuildConfigRepo";
+import { QueryOperator } from "ts-mongodb-orm/build/queries/QueryOperator";
 
 @Service()
 class GuildConfigService {
@@ -54,6 +55,12 @@ class GuildConfigService {
     return await this.GuildCategoryRepo.filterOne("_id", (x) =>
       x.eq(categoryId)
     );
+  }
+
+  async getAllByCategoryId(categoryId: string) {
+    return (await this.getAllChannels()).filter(x => {
+      return Object.values(x.channels).find(x =>  x.category === categoryId ) !== undefined
+    })
   }
 
   async getByChannel(guild: string, channel: string) {

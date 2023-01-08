@@ -39,9 +39,6 @@ export const bot = new Client({
     prefix: "!",
   },
 });
-bot.on("typingStart", (typing: Typing) => {
-  // console.log(typing)
-});
 function syncActivities() {
   const activities = [
     {

@@ -23,7 +23,8 @@ import { ObjectID } from "ts-mongodb-orm";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
-import syncUtils from "../../utils/syncModerationUtils";
+import syncUtils, { asyncForEach } from "../../utils/syncModerationUtils";
+import bot from "../../main";
 
 export const options: { [key: string]: string[] } = {
   ["noInvites"]: ["True", "False"],
@@ -49,7 +50,7 @@ class syncModeration {
   private guildConfigService: GuildConfigService;
   @Inject()
   private syncUtils: syncUtils;
-  
+
   private setupData: { [key: string]: { channel: string } } = {};
 
   @Slash({
@@ -123,35 +124,12 @@ class syncModeration {
     };
     await this.guildConfigService.save(data);
 
-    await this.syncUtils.sendToAllChannels(category, {content: "**" + interaction.guild?.name + "** joined the chat!"})
+    await this.syncUtils.sendToAllChannels(category, {
+      content: "**" + interaction.guild?.name + "** joined the chat!",
+    });
 
     await interaction.editReply("Success!");
     return;
-  }
-
-  @Slash({
-    description: "Shows you the information about this Channel.",
-  })
-  async info(interaction: CommandInteraction) {
-    await interaction.deferReply({ ephemeral: true });
-    var found = await this.guildConfigService.getByChannel(
-      interaction.guildId!,
-      interaction.channelId
-    );
-    var category = await this.guildConfigService.findCategory(
-      new ObjectID(found?.category)
-    );
-
-    if (category) {
-      var embed = new EmbedBuilder().setTitle("Information");
-      embed.addFields(
-        { name: "Category:", value: category.name },
-        { name: "NSFW:", value: String(category.nsfw) }
-      );
-      await interaction.editReply({ embeds: [embed] });
-    } else {
-      await interaction.editReply("This isnt a Chat Sync chat!");
-    }
   }
 
   @Slash({
