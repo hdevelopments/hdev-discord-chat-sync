@@ -64,7 +64,7 @@ class GuildConfigService {
   }
 
   async getByChannel(guild: string, channel: string) {
-    return (await this.GuildConfigRepo.filterOne("guild", (x) => x.exists()))
+    return (await this.GuildConfigRepo.filterOne("guild", (x) => x.eq(guild)))
       ?.channels[channel];
   }
 
