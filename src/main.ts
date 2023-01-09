@@ -9,7 +9,6 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import express from "express";
 import { apirouter } from "./express/api/api";
-import * as dcRP from "discord-rich-presence"
 
 var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
@@ -134,16 +133,7 @@ var App = express();
 App.use("/api", apirouter);
 
 App.listen(3000);
-const rpcClient = dcRP.default("1046756800260735058")
-rpcClient.updatePresence({
-  state: "slithering",
-  details: "🐍",
-  startTimestamp: Date.now(),
-  endTimestamp: Date.now() + 1337,
-  largeImageKey: "hdevrainbow",
-  smallImageKey: "hdevorange",
-  instance: true,
-});
+
 
 export default bot;
 export { App };
