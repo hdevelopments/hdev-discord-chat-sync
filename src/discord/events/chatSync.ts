@@ -100,7 +100,7 @@ export class chatSync {
     this.guildConfig.save(config);
   }
 
-  @ButtonComponent({ id: /details-(\d+)-(\d+)-(\d+)-(\d+)/ })
+  @ButtonComponent({ id: /details-(\d+)-(\d+)(-(\d+)-(\d+))?/ })
   async doDetails(interaction: ButtonInteraction) {
     var data = interaction.customId.split("-");
 
