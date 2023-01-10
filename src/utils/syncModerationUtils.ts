@@ -166,7 +166,7 @@ export default class syncUtils {
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
-      console.log(Boolean(guildConfig.configs["noButtons"]))
+      console.log(guildConfig.configs["noButtons"])
       console.log(guildConfig.guild)
       if (
         guildEmbed.data.author &&
