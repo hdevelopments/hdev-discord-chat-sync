@@ -170,8 +170,7 @@ export default class syncUtils {
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
-      console.log(guildConfig.configs["noButtons"]);
-      console.log(guildConfig.guild);
+
       if (
         guildEmbed.data.author &&
         guildConfig.configs["noButtons"]?.toLowerCase() === "true"
@@ -180,7 +179,7 @@ export default class syncUtils {
       }
       if (
         urls.length > 0 &&
-        Boolean(guildConfig.configs["noEmbeddedLinks"]) === true &&
+        guildConfig.configs["noEmbeddedLinks"]?.toLowerCase() === true &&
         guildConfig.configs["type"] !=
           "Webhook ( Small, it does need the Webhook permission! )"
       ) {
