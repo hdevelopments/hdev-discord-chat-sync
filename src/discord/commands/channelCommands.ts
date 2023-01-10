@@ -30,8 +30,6 @@ class channelCommands {
     var category = await this.guildConfigService.findCategory(
       new ObjectID(found?.category)
     );
-    console.log(found)
-    console.log(category)
     if (category) {
       var allFound = await this.guildConfigService.getAllByCategoryId(
         found?.category!

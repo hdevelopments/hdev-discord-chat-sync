@@ -4,7 +4,6 @@ import {
   AutocompleteInteraction,
   ChannelType,
   CommandInteraction,
-  EmbedBuilder,
   GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
   StringSelectMenuBuilder,
@@ -19,21 +18,19 @@ import {
   SlashGroup,
   SlashOption,
 } from "discordx";
-import { ObjectID } from "ts-mongodb-orm";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
-import syncUtils, { asyncForEach } from "../../utils/syncModerationUtils";
-import bot from "../../main";
+import syncUtils from "../../utils/syncModerationUtils";
 
 export const options: { [key: string]: string[] } = {
-  ["noInvites"]: ["True", "False"],
-  ["noEmbeddedLinks"]: ["True", "False"],
+  ["noInvites"]: ["true", "false"],
+  ["noEmbeddedLinks"]: ["true", "false"],
   ["type"]: [
     "Embed ( Big, Default )",
     "Webhook ( Small, it does need the Webhook permission! )",
   ],
-  ["noButtons"]: ["True", "False"],
+  ["noButtons"]: ["true", "false"],
 };
 
 @Discord()

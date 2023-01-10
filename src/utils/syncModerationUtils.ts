@@ -138,7 +138,6 @@ export default class syncUtils {
     }
 
     allChannels.forEach(async (x, i) => {
-  
       if (!x.channel || ("member" in message) && x.channel === message.channelId) return;
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       var channel: BaseGuildTextChannel;
@@ -167,6 +166,8 @@ export default class syncUtils {
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
+      console.log(Boolean(guildConfig.configs["noButtons"]))
+      console.log(guildConfig.guild)
       if (
         guildEmbed.data.author &&
         Boolean(guildConfig.configs["noButtons"]) === true
