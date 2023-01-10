@@ -53,7 +53,16 @@ export default class syncUtils {
         .setLabel("Details")
         .setEmoji("ℹ️")
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId("details-" + message.channelId + "-" + message.id);
+        .setCustomId(
+          "details-" +
+            message.channelId +
+            "-" +
+            message.id +
+            "-" +
+            message.author.id +
+            "-" +
+            message.guildId
+        );
       const categoryBtn = new ButtonBuilder()
         .setLabel(foundCategory?.name || "No Category")
         .setStyle(ButtonStyle.Secondary)

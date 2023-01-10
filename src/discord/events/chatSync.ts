@@ -55,8 +55,10 @@ export class chatSync {
 
     var foundChannel = config.channels[message.channelId];
     if (!foundChannel) return;
-  
-    var category = await this.guildConfig.getByCategoryId(foundChannel.category);
+
+    var category = await this.guildConfig.getByCategoryId(
+      foundChannel.category
+    );
     var phishingresult = await this.phishingService.checkForPhishing(message);
     if (phishingresult === true) {
       var logchannel = (await bot.channels.fetch(
@@ -98,12 +100,14 @@ export class chatSync {
     this.guildConfig.save(config);
   }
 
-  @ButtonComponent({ id: /details-(\d+)-(\d+)/ })
+  @ButtonComponent({ id: /details-(\d+)-(\d+)-(\d+)-(\d+)/ })
   async doDetails(interaction: ButtonInteraction) {
     var data = interaction.customId.split("-");
 
     var channelId = data[1];
     var messageId = data[2];
+    var userId = data[3];
+    var guildId = data[4];
 
     var modal = new ModalBuilder()
       .setTitle("Details about a message")
@@ -179,6 +183,17 @@ export class chatSync {
         .setStyle(TextInputStyle.Short)
         .setValue(
           "An error occured! (Guild / Channel is not existing anymore?)"
+        )
+        .setRequired(false);
+      const dataComponent = new TextInputBuilder()
+        .setCustomId("error-info")
+        .setLabel("Found Data")
+        .setStyle(TextInputStyle.Paragraph)
+        .setValue(
+          `ChannelID: ${channelId}\n
+          MessageID: ${messageId}\n
+          UserID: ${userId}\n
+          ServerID: ${guildId}`
         )
         .setRequired(false);
       const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
