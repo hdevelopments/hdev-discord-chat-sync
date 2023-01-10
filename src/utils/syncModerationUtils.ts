@@ -138,7 +138,11 @@ export default class syncUtils {
     }
 
     allChannels.forEach(async (x, i) => {
-      if (!x.channel || ("member" in message) && x.channel === message.channelId) return;
+      if (
+        !x.channel ||
+        ("member" in message && x.channel === message.channelId)
+      )
+        return;
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       var channel: BaseGuildTextChannel;
       try {
@@ -157,20 +161,20 @@ export default class syncUtils {
         return;
       }
       if (!channel) return;
-      if(!("member" in message)){
-        await channel.send(message)
-        return
+      if (!("member" in message)) {
+        await channel.send(message);
+        return;
       }
       var guildEmbed = new EmbedBuilder(embed.toJSON());
 
       var rowForGuild = new ActionRowBuilder<MessageActionRowComponentBuilder>(
         row
       );
-      console.log(guildConfig.configs["noButtons"])
-      console.log(guildConfig.guild)
+      console.log(guildConfig.configs["noButtons"]);
+      console.log(guildConfig.guild);
       if (
         guildEmbed.data.author &&
-        Boolean(guildConfig.configs["noButtons"]) === true
+        guildConfig.configs["noButtons"]?.toLowerCase() === "true"
       ) {
         guildEmbed.data.author.name += ` (${message.author.id})`;
       }
@@ -196,7 +200,7 @@ export default class syncUtils {
           await channel.send({
             embeds: [guildEmbed],
             components:
-              Boolean(guildConfig.configs["noButtons"]) === true
+              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
                 ? []
                 : [rowForGuild],
             allowedMentions: {
@@ -211,7 +215,9 @@ export default class syncUtils {
           channel.send({
             embeds: [guildEmbed],
             components:
-              Boolean(guildConfig.configs["noButtons"]) === true ? [] : [row],
+              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
+                ? []
+                : [row],
             allowedMentions: {
               repliedUser: false,
               parse: [],
@@ -233,12 +239,12 @@ export default class syncUtils {
           webhook.send({
             content: text,
             components:
-              Boolean(guildConfig.configs["noButtons"]) === true
+              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
                 ? []
                 : [rowForGuild],
             username:
               (message.member?.nickname || message.author.username) +
-              ((Boolean(guildConfig.configs["noButtons"]) === true &&
+              ((guildConfig.configs["noButtons"]?.toLowerCase() === "true" &&
                 ` (${message.author.id})`) ||
                 ""),
             avatarURL:
@@ -260,7 +266,7 @@ export default class syncUtils {
               ": " +
               message.content,
             components:
-              Boolean(guildConfig.configs["noButtons"]) === true
+              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
                 ? []
                 : [rowForGuild],
             allowedMentions: {
