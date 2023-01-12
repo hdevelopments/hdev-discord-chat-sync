@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "esnext",
     "module": "esnext",
     "outDir": "build",
     "lib": ["ES2022", "DOM"],
@@ -22,11 +22,13 @@
     "incremental": true,
     "noUnusedLocals": false,
     "strictPropertyInitialization": false,
+    "declarationDir": "./src/types"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["build", "node_modules"],
   "ts-node": {
     "esm": true,
-    "experimentalSpecifierResolution": "node"
+    "experimentalSpecifierResolution": "node",
+    "files": true,
 }
 }
