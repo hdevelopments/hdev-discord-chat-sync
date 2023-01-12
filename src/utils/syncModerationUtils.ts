@@ -27,18 +27,21 @@ export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
   async sendToAllChannels(
-    category: string,
+    category: string | undefined,
     message: Message | MessageCreateOptions
   ) {
+    var text: string | undefined;
+
     var row: ActionRowBuilder<MessageActionRowComponentBuilder>;
     var allGuilds = await this.GuildConfig.getAllChannels();
     var allChannels = allGuilds
       .filter((x) => !x.banned)
       .flatMap((x) =>
         Object.entries(x.channels)
-          .filter((x) => x[1].category === category)
+          .filter((x) => category === undefined || x[1].category === category)
           .map((x) => x[1])
       );
+    var urls;
     if ("member" in message) {
       if (
         (!message.content || message.content.trim().length === 0) &&
@@ -48,6 +51,8 @@ export default class syncUtils {
       var foundCategory = await this.GuildConfig.findCategory(
         new ObjectID(category)
       );
+      if (category !== undefined) {
+      }
 
       const guildBtn = new ButtonBuilder()
         .setLabel("Details")
@@ -90,51 +95,57 @@ export default class syncUtils {
         iconURL: message.guild?.iconURL() || undefined,
       });
 
-      embed.setColor((author.hexAccentColor as ColorResolvable) || "Blurple");
+      embed.setColor(author.hexAccentColor || "Blurple");
       embed.setTimestamp(Date.now());
 
       var isInBotCache = false;
-      var original = message.content || "";
-
-      embed.setDescription(original);
-
-      if (original.trim().length === 0 && message.stickers.size > 0) {
+      var original = message.content;
+      if (
+        original.trim().length === 0 &&
+        message.stickers.size > 0
+      ) {
         message.stickers.forEach((x) => {
           original += x.url + " \n ";
         });
       }
+      
+      embed.setDescription(original || null);
 
-      var text = original;
+      console.log(original);
 
-      var animatedemojis = original.matchAll(
-        /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
-      );
-      var emojis = original.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
-      for (let n of emojis) {
-        let url = hyperlink(
-          n[0],
-          "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
-          "The custom Emote"
+      text = original;
+      if (original && text) {
+        var animatedemojis = original.matchAll(
+          /<a:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim
         );
-        if (bot.emojis.cache.get(n[1])) {
-          isInBotCache = true;
-        } else {
-          text = text.replaceAll(n[0], url);
+        var emojis = original.matchAll(/<:[A-Z0-9\_\+\/\{\}\\]+:(\d+)>/gim);
+        for (let n of emojis) {
+          let url = hyperlink(
+            n[0],
+            "https://cdn.discordapp.com/emojis/" + n[1] + ".png?v=1",
+            "The custom Emote"
+          );
+          if (bot.emojis.cache.get(n[1])) {
+            isInBotCache = true;
+          } else {
+            text = text.replaceAll(n[0], url);
+          }
         }
-      }
-      for (let n of animatedemojis) {
-        let url = hyperlink(
-          n[0],
-          "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
-          "The custom Emote"
-        );
-        if (bot.emojis.cache.get(n[1])) {
-          isInBotCache = true;
-        } else {
-          text = text.replaceAll(n[0], url);
+
+        for (let n of animatedemojis) {
+          let url = hyperlink(
+            n[0],
+            "https://cdn.discordapp.com/emojis/" + n[1] + ".gif?v=1",
+            "The custom Emote"
+          );
+          if (bot.emojis.cache.get(n[1])) {
+            isInBotCache = true;
+          } else {
+            text = text.replaceAll(n[0], url);
+          }
         }
+        urls = Array.from(text.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
       }
-      var urls = Array.from(text.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
 
       if (isInBotCache) {
         const customemojis = new ButtonBuilder()
@@ -145,7 +156,9 @@ export default class syncUtils {
         row.addComponents(customemojis);
       }
     }
-
+    if (text === "") {
+      text = undefined;
+    }
     allChannels.forEach(async (x, i) => {
       if (
         !x.channel ||
@@ -187,7 +200,7 @@ export default class syncUtils {
         guildEmbed.data.author.name += ` (${message.author.id})`;
       }
       if (
-        urls.length > 0 &&
+        urls?.length > 0 &&
         guildConfig.configs["noEmbeddedLinks"]?.toLowerCase() === true &&
         guildConfig.configs["type"] !=
           "Webhook ( Small, it does need the Webhook permission! )"
@@ -199,7 +212,7 @@ export default class syncUtils {
 
         rowForGuild.addComponents(links);
       }
-      guildEmbed.setDescription(text);
+      guildEmbed.setDescription(text || null);
       if (
         guildConfig.configs["type"] !=
         "Webhook ( Small, it does need the Webhook permission! )"
@@ -245,7 +258,7 @@ export default class syncUtils {
               reason: "No valid webhook found before!",
             }));
           webhook.send({
-            content: text,
+            content: text || undefined,
             components:
               guildConfig.configs["noButtons"]?.toLowerCase() === "true"
                 ? []

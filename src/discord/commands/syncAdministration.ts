@@ -1,6 +1,9 @@
 import {
   ApplicationCommandOptionType,
   CommandInteraction,
+  Embed,
+  EmbedBuilder,
+  PermissionFlagsBits,
 } from "discord.js";
 import {
   Discord,
@@ -13,6 +16,7 @@ import {
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
+import syncUtils from "../../utils/syncModerationUtils";
 
 @Discord()
 @SlashGroup({
@@ -27,6 +31,9 @@ import { noDms } from "../guards/noDms";
 class syncAdministration {
   @Inject()
   private guildConfigService: GuildConfigService;
+
+  @Inject()
+  private syncModeration: syncUtils;
 
   @Slash({
     description: "Bans a Guild.",
@@ -127,5 +134,41 @@ class syncAdministration {
 
     await this.guildConfigService.removeCategory(found);
     await interaction.editReply("Category successfully removed!");
+  }
+
+  @Slash({
+    description: "Removes a Category.",
+  })
+  async announce(
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      description: "The title",
+      name: "title",
+      required: true,
+      maxLength: 238,
+    })
+    title: string,
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      description: "The description",
+      name: "description",
+      maxLength: 4095,
+    })
+    description: string,
+    interaction: CommandInteraction
+  ) {
+    await interaction.deferReply({ ephemeral: true });
+
+    var embed = new EmbedBuilder();
+    embed.setTitle("BOT Announcement: " + title);
+    embed.setDescription(description);
+    embed.setAuthor({
+      name: interaction.user.username,
+      iconURL: interaction.user.displayAvatarURL(),
+    });
+    embed.setColor("Gold")
+    await this.syncModeration.sendToAllChannels(undefined, { embeds: [embed] });
+
+    await interaction.editReply("Successfully announced!");
   }
 }
