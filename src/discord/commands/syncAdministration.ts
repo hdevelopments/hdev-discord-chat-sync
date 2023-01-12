@@ -160,8 +160,7 @@ class syncAdministration {
     await interaction.deferReply({ ephemeral: true });
 
     var embed = new EmbedBuilder();
-    embed.setTitle("BOT Announcement: " + title);
-    embed.setDescription(description);
+    embed.addFields({name: "BOT Announcement: " + title, value: description});
     embed.setAuthor({
       name: interaction.user.username,
       iconURL: interaction.user.displayAvatarURL(),
