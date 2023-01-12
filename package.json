@@ -12,10 +12,10 @@
     "watch": "nodemon --exec ts-node-esm src/main.ts"
   },
   "dependencies": {
-    "@discordx/di": "^3.0.2",
+    "@discordx/di": "^3.0.3",
     "@discordx/importer": "^1.1.10",
     "@discordx/pagination": "^3.4.0",
-    "axios": "^1.2.1",
+    "axios": "^1.2.2",
     "discord-rich-presence": "^0.0.8",
     "discord-rpc": "^4.0.1",
     "discord.js": "^14.7.1",
@@ -26,6 +26,7 @@
     "reflect-metadata": "^0.1.13",
     "snoowrap": "^1.23.0",
     "timed-cache": "^2.0.0",
+    "translate-google": "^1.5.0",
     "ts-mongodb-orm": "^2.0.1",
     "ts-node": "^10.9.1",
     "typedi": "^0.10.0",
@@ -39,7 +40,7 @@
     "@types/node": "^18.11.18",
     "@types/timed-cache": "^2.0.1",
     "nodemon": "^2.0.20",
-    "prettier": "^2.8.1"
+    "prettier": "^2.8.2"
   },
   "engines": {
     "node": ">=16.0.0",
