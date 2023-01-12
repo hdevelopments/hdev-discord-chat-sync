@@ -8,11 +8,9 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Discord, Guard, Slash } from "discordx";
-import { noDms } from "../guards/noDms";
 import bot from "../../main";
 
 @Discord()
-@Guard(noDms)
 class infoCommand {
   @Slash({
     description: "Gets you some information about the bot.",

@@ -88,7 +88,7 @@ class redditService {
       url: "https://www.reddit.com/user/" + data.author.name,
     });
     embed.setFooter({
-      text: `Found by: ${inter.member?.user.username}@${inter.member?.user.discriminator} | ${inter.member?.user.id}`,
+      text: `Found by: ${inter.user.username}@${inter.user.discriminator} | ${inter.user.id}`,
       iconURL: inter.user.avatarURL() || undefined,
     });
     if (data.is_video) {
