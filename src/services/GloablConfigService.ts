@@ -37,7 +37,9 @@ class GlobalConfigService {
   async isBlacklistedText(text: string){
     var config = await this.getOrCreate()
     return config.blacklistText.find(x => {
-        return text.match(RegExp(x))?.length !== undefined
+        console.log(x)
+        console.log(text.match(RegExp(x, "gim")))
+        return text.match(RegExp(x, "gim"))?.length !== undefined
     }) !== undefined
   }
 }
