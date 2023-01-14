@@ -5,7 +5,6 @@ import guildCategory from "../models/db-models/GuildCategoryModel";
 import guildConfig from "../models/db-models/GuildConfigModel";
 import GuildCategoryRepo from "../repositories/GuildCategoryRepo";
 import GuildConfigRepo from "../repositories/GuildConfigRepo";
-import { QueryOperator } from "ts-mongodb-orm/build/queries/QueryOperator";
 
 @Service()
 class GuildConfigService {

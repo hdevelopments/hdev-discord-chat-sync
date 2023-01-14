@@ -15,4 +15,6 @@ export default class guildCategory extends BaseModel {
   fallback?: boolean;
   @Field()
   description?: string;
+  @Field()
+  configs: {[key:string]:any} = {}
 }

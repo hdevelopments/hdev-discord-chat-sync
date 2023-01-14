@@ -64,6 +64,7 @@ class topicModeration {
         category: foundTopic._id.toString(),
         channel: channel.id,
         guild: interaction.guildId!,
+        configs: {},
         lastMessage: Date.now(),
       };
 
@@ -89,6 +90,13 @@ class topicModeration {
       required: true,
     })
     topic: string,
+    @SlashOption({
+      description: "The channel",
+      name: "channel",
+      type: ApplicationCommandOptionType.Channel,
+      channelTypes: [ChannelType.GuildText, ChannelType.GuildAnnouncement],
+      required: true,
+    })
     channel: TextChannel,
     interaction: CommandInteraction
   ) {
@@ -122,6 +130,12 @@ class topicModeration {
       required: true,
     })
     password: string,
+    @SlashOption({
+      type: ApplicationCommandOptionType.Boolean,
+      description: "Are attachments enabled?",
+      name: "attachments",
+    })
+    attachments: boolean = false,
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
@@ -134,8 +148,8 @@ class topicModeration {
       topic,
       interaction.member?.user!
     );
-
     createTopic.password = password;
+    createTopic.configs["attachments"] = String(attachments)
     await this.guildConfigService.saveCategory(createTopic);
 
     await interaction.editReply(

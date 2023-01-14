@@ -1,11 +1,21 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
-import { Discord, SlashGroup, Guard, Slash } from "discordx";
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, EmbedBuilder, TextBasedChannel } from "discord.js";
+import { Discord, SlashGroup, Guard, Slash, SlashOption, SlashChoice } from "discordx";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import { ObjectID } from "ts-mongodb-orm";
 import { asyncForEach } from "../../utils/syncModerationUtils";
 import bot from "../../main";
+
+const options: {[key: string] : string[]} = {
+  ["noInvites"]: ["true", "false"],
+  ["noEmbeddedLinks"]: ["true", "false"],
+  ["type"]: [
+    "Embed ( Big, Default )",
+    "Webhook ( Small, it does need the Webhook permission! )",
+  ],
+  ["noButtons"]: ["true", "false"],
+}
 
 @Discord()
 @SlashGroup({
@@ -71,5 +81,69 @@ class channelCommands {
     } else {
       await interaction.editReply("This isnt a Chat Sync chat!");
     }
+  }
+  @Slash({
+    description: "Lets you set some options.",
+  })
+  async set(
+    @SlashChoice(
+      ...Object.entries(options).map((data) => {
+        return { name: data[0], value: data[0] };
+      })
+    )
+    @SlashOption({
+      description: "The Option",
+      name: "option",
+      type: ApplicationCommandOptionType.String,
+      required: true,
+    })
+    option: string,
+    @SlashOption({
+      description: "The new Value",
+      name: "value",
+      autocomplete: channelCommands.optionCompleter,
+      type: ApplicationCommandOptionType.String,
+      required: true,
+    })
+    newValue: any,
+    @SlashOption({
+      description: "The chanel",
+      name: "channel",
+      type: ApplicationCommandOptionType.Channel,
+    })
+    channel: TextBasedChannel,
+    interaction: CommandInteraction
+  ) {
+    if(!options[option].includes(newValue)) {
+    await interaction.reply({ ephemeral: true, content: "You need to select one of the given options!" });
+    }
+    await interaction.deferReply({ ephemeral: true });
+    var config = await this.guildConfigService.getOrCreate(
+      interaction.guildId!
+    );
+
+    var foundchannel = config.channels[channel?.id || interaction.channelId]
+
+    if(!foundchannel){
+      interaction.editReply("Sorry the choosen channel isnt a sync channel!")
+      return
+    }
+    foundchannel.configs[option] = newValue
+    await this.guildConfigService.save(config);
+    await interaction.editReply("Success!");
+  }
+
+  static optionCompleter(interaction: AutocompleteInteraction) {
+    var option = interaction.options.getString("option");
+    if (!option) {
+      interaction.respond([{ name: "please select a option!", value: "no" }]);
+      return;
+    }
+
+    interaction.respond(
+      options[option].map((x) => {
+        return { name: x, value: x };
+      })
+    );
   }
 }

@@ -16,6 +16,7 @@ import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
 import syncUtils from "../../utils/syncModerationUtils";
 import { Phishing } from "./anti-phishing";
+import GlobalConfigService from "../../services/GloablConfigService";
 @Discord()
 export class chatSync {
   @Inject()
@@ -24,6 +25,8 @@ export class chatSync {
   private phishingService: Phishing;
   @Inject()
   private syncUtils: syncUtils;
+  @Inject()
+  private globalConfigService: GlobalConfigService;
 
   @On({ event: Events.MessageCreate, priority: 1 })
   async handler([message]: ArgsOf<Events.MessageCreate>): Promise<void> {
@@ -41,7 +44,9 @@ export class chatSync {
     ) {
       return;
     }
-
+    if((await this.globalConfigService.getOrCreate()).blacklisted[message.author.id]){
+      return
+    }
     var config = await this.guildConfig.getOrCreate(message.guildId!);
     if (
       !config ||

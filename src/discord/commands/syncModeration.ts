@@ -52,7 +52,6 @@ class syncModeration {
 
   @Slash({
     description: "Set the channel for chatting.",
-    dmPermission: false,
     name: "setchannel",
   })
   async setchatchannel(
@@ -67,7 +66,10 @@ class syncModeration {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply();
-
+    if((await this.guildConfigService.getOrCreate(interaction.id)).banned){
+      interaction.editReply("Your guild got banned! Please create a unbann request on the Support Server (see /info)")
+      return
+    }
     var categories = await this.guildConfigService.getAllCategories();
 
     // create menu for roles
@@ -117,6 +119,7 @@ class syncModeration {
       category: category,
       channel: setupData,
       guild: interaction.guildId!,
+      configs: {},
       lastMessage: Date.now(),
     };
     await this.guildConfigService.save(data);
@@ -174,6 +177,9 @@ class syncModeration {
     newValue: any,
     interaction: CommandInteraction
   ) {
+    if(!options[option].includes(newValue)) {
+    await interaction.reply({ ephemeral: true, content: "You need to select one of the given options!" });
+    }
     await interaction.deferReply({ ephemeral: true });
     var config = await this.guildConfigService.getOrCreate(
       interaction.guildId!

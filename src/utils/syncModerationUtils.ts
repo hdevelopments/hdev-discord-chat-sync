@@ -1,9 +1,9 @@
 import {
   ActionRowBuilder,
+  AttachmentBuilder,
   BaseGuildTextChannel,
   ButtonBuilder,
   ButtonStyle,
-  ColorResolvable,
   EmbedBuilder,
   hyperlink,
   Message,
@@ -14,6 +14,7 @@ import { ObjectID } from "ts-mongodb-orm";
 import { Inject, Service } from "typedi";
 import bot from "../main";
 import GuildConfigService from "../services/GuildConfigService";
+import GlobalConfigService from "../services/GloablConfigService";
 export async function asyncForEach<T>(
   array: T[],
   callback: (value: T, index: number, array: any[]) => unknown
@@ -26,6 +27,7 @@ export async function asyncForEach<T>(
 export default class syncUtils {
   @Inject()
   private GuildConfig: GuildConfigService;
+
   async sendToAllChannels(
     category: string | undefined,
     message: Message | MessageCreateOptions
@@ -43,16 +45,16 @@ export default class syncUtils {
       );
     var urls;
     if ("member" in message) {
-      if (
-        (!message.content || message.content.trim().length === 0) &&
-        message.stickers.size === 0
-      )
-        return;
       var foundCategory = await this.GuildConfig.findCategory(
         new ObjectID(category)
       );
-      if (category !== undefined) {
-      }
+      if (
+        (!message.content || message.content.trim().length === 0) &&
+        message.stickers.size === 0 &&
+        message.attachments.size === 0 &&
+        foundCategory?.configs["attachments"]?.toLowerCase() === "true"
+      )
+        return;
 
       const guildBtn = new ButtonBuilder()
         .setLabel("Details")
@@ -100,18 +102,13 @@ export default class syncUtils {
 
       var isInBotCache = false;
       var original = message.content;
-      if (
-        original.trim().length === 0 &&
-        message.stickers.size > 0
-      ) {
+      if (original.trim().length === 0 && message.stickers.size > 0) {
         message.stickers.forEach((x) => {
           original += x.url + " \n ";
         });
       }
-      
-      embed.setDescription(original || null);
 
-      console.log(original);
+      embed.setDescription(original || null);
 
       text = original;
       if (original && text) {
@@ -165,6 +162,8 @@ export default class syncUtils {
         ("member" in message && x.channel === message.channelId)
       )
         return;
+
+      x.configs = x.configs || {};
       var guildConfig = await this.GuildConfig.getOrCreate(x.guild);
       var channel: BaseGuildTextChannel;
       try {
@@ -195,15 +194,20 @@ export default class syncUtils {
 
       if (
         guildEmbed.data.author &&
-        guildConfig.configs["noButtons"]?.toLowerCase() === "true"
+        ((guildConfig.configs["noButtons"]?.toLowerCase() === "true" &&
+          x.configs["noButtons"]?.toLowerCase() !== "false") ||
+          x.configs["noButtons"]?.toLowerCase() === "true")
       ) {
         guildEmbed.data.author.name += ` (${message.author.id})`;
       }
       if (
         urls?.length > 0 &&
-        guildConfig.configs["noEmbeddedLinks"]?.toLowerCase() === true &&
-        guildConfig.configs["type"] !=
-          "Webhook ( Small, it does need the Webhook permission! )"
+        ((guildConfig.configs["noEmbeddedLinks"]?.toLowerCase() === "false" &&
+          guildConfig.configs["type"] !=
+            "Webhook ( Small, it does need the Webhook permission! )") ||
+          (x.configs["type"] !=
+            "Webhook ( Small, it does need the Webhook permission! )" &&
+            x.configs["noEmbeddedLinks"]?.toLowerCase() !== "true"))
       ) {
         const links = new ButtonBuilder()
           .setLabel("Preview embedded version of links!")
@@ -215,13 +219,16 @@ export default class syncUtils {
       guildEmbed.setDescription(text || null);
       if (
         guildConfig.configs["type"] !=
-        "Webhook ( Small, it does need the Webhook permission! )"
+          "Webhook ( Small, it does need the Webhook permission! )" &&
+        x.configs["type"] !=
+          "Webhook ( Small, it does need the Webhook permission! )"
       ) {
         try {
           await channel.send({
             embeds: [guildEmbed],
             components:
-              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
+              guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
+              x.configs["noButtons"]?.toLowerCase() === "true"
                 ? []
                 : [rowForGuild],
             allowedMentions: {
@@ -230,13 +237,25 @@ export default class syncUtils {
               roles: [],
               users: [],
             },
+            files:
+              foundCategory?.configs["attachments"]?.toLowerCase() === "true"
+                ? [
+                    ...message.attachments.map((val) => {
+                      return new AttachmentBuilder(val.attachment, {
+                        description: val.description || undefined,
+                        name: val.name || undefined,
+                      });
+                    }),
+                  ]
+                : [],
           });
         } catch (exc: any) {
           console.log(exc);
           channel.send({
             embeds: [guildEmbed],
             components:
-              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
+              guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
+              x.configs["noButtons"]?.toLowerCase() !== "true"
                 ? []
                 : [row],
             allowedMentions: {
@@ -257,46 +276,79 @@ export default class syncUtils {
               name: "Hedges Chatter Webhook",
               reason: "No valid webhook found before!",
             }));
-          webhook.send({
-            content: text || undefined,
-            components:
-              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
-                ? []
-                : [rowForGuild],
-            username:
-              (message.member?.nickname || message.author.username) +
-              ((guildConfig.configs["noButtons"]?.toLowerCase() === "true" &&
-                ` (${message.author.id})`) ||
-                ""),
-            avatarURL:
-              message.member?.avatarURL() ||
-              message.author.avatarURL() ||
-              message.author.defaultAvatarURL ||
-              undefined,
-            allowedMentions: {
-              repliedUser: false,
-              parse: [],
-              roles: [],
-              users: [],
-            },
-          });
-        } catch (exc) {
-          channel.send({
-            content:
-              (message.member?.nickname || message.author.username) +
-              ": " +
-              message.content,
-            components:
-              guildConfig.configs["noButtons"]?.toLowerCase() === "true"
-                ? []
-                : [rowForGuild],
-            allowedMentions: {
-              repliedUser: false,
-              parse: [],
-              roles: [],
-              users: [],
-            },
-          });
+          if (text)
+            webhook.send({
+              content: text,
+              components:
+                guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
+                x.configs["noButtons"]?.toLowerCase() === "true"
+                  ? []
+                  : [rowForGuild],
+              username:
+                (message.member?.nickname || message.author.username) +
+                (((guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
+                  x.configs["noButtons"]?.toLowerCase() === "true") &&
+                  ` (${message.author.id})`) ||
+                  ""),
+              avatarURL:
+                message.member?.avatarURL() ||
+                message.author.avatarURL() ||
+                message.author.defaultAvatarURL ||
+                undefined,
+              allowedMentions: {
+                repliedUser: false,
+                parse: [],
+                roles: [],
+                users: [],
+              },
+              files:
+                foundCategory?.configs["attachments"]?.toLowerCase() === "true"
+                  ? [
+                      ...message.attachments.map((val) => {
+                        return new AttachmentBuilder(val.attachment, {
+                          description: val.description || undefined,
+                          name: val.name || undefined,
+                        });
+                      }),
+                    ]
+                  : [],
+            });
+        } catch {
+          if (message.content)
+            channel.send({
+              content:
+                (message.member?.nickname || message.author.username) +
+                ": " +
+                message.content,
+              components:
+                guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
+                x.configs["noButtons"]?.toLowerCase() === "true"
+                  ? []
+                  : [rowForGuild],
+              allowedMentions: {
+                repliedUser: false,
+                parse: [],
+                roles: [],
+                users: [],
+              },
+            });
+          if (
+            message.attachments.size > 0 &&
+            foundCategory?.configs["attachments"]?.toLowerCase() === "true"
+          ) {
+            channel
+              .send({
+                files: [
+                  ...message.attachments.map((val) => {
+                    return new AttachmentBuilder(val.attachment, {
+                      description: val.description || undefined,
+                      name: val.name || undefined,
+                    });
+                  }),
+                ],
+              })
+              .catch((x) => {});
+          }
         }
       }
     });

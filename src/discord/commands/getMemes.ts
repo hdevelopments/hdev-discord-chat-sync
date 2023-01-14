@@ -24,6 +24,7 @@ import redditService from "../../services/redditService";
 import { Listing, Submission } from "snoowrap";
 import Cache from "timed-cache";
 import syncUtils from "../../utils/syncModerationUtils";
+import GuildConfigService from "../../services/GuildConfigService";
 
 @Discord()
 @SlashGroup({
@@ -34,6 +35,8 @@ import syncUtils from "../../utils/syncModerationUtils";
 @SlashGroup("memes")
 @Guard(noDms)
 class getMemes {
+  @Inject()
+  private guildConfigService: GuildConfigService;
   @Inject()
   private redditService: redditService;
   @Inject()
@@ -80,7 +83,10 @@ class getMemes {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
-
+    if((await this.guildConfigService.getOrCreate(interaction.id)).banned){
+      interaction.editReply("Your guild got banned! Please create a unbann request on the Support Server (see /info)")
+      return
+    }
     if (refresh) {
       this.memeCache.put(subreddit, false);
       this.lastMeme.delete(subreddit);

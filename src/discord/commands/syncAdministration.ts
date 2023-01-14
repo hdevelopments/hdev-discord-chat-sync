@@ -1,14 +1,18 @@
 import {
+  ActionRowBuilder,
   ApplicationCommandOptionType,
   CommandInteraction,
-  Embed,
   EmbedBuilder,
-  PermissionFlagsBits,
+  ModalBuilder,
+  ModalSubmitInteraction,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import {
   Discord,
   Guard,
   Guild,
+  ModalComponent,
   Slash,
   SlashGroup,
   SlashOption,
@@ -17,6 +21,7 @@ import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import syncUtils from "../../utils/syncModerationUtils";
+import GlobalConfigService from "../../services/GloablConfigService";
 
 @Discord()
 @SlashGroup({
@@ -30,7 +35,11 @@ import syncUtils from "../../utils/syncModerationUtils";
 @Guard(noDms)
 class syncAdministration {
   @Inject()
-  private guildConfigService: GuildConfigService;
+  private guildConfigService: GuildConfigService
+
+  @Inject()
+  private globalConfigService: GlobalConfigService;
+
 
   @Inject()
   private syncModeration: syncUtils;
@@ -100,6 +109,12 @@ class syncAdministration {
       name: "description",
     })
     description: string,
+    @SlashOption({
+      type: ApplicationCommandOptionType.Boolean,
+      description: "Are attachments enabled?",
+      name: "attachments",
+    })
+    attachments: boolean = false,
     interaction: CommandInteraction
   ) {
     await interaction.deferReply();
@@ -109,6 +124,7 @@ class syncAdministration {
     );
     found.nsfw = nsfw === true;
     found.description = description;
+    found.configs["attachments"] = String(attachments)
     await this.guildConfigService.saveCategory(found);
     await interaction.editReply("Category successfully created!");
   }
@@ -137,35 +153,71 @@ class syncAdministration {
   }
 
   @Slash({
-    description: "Removes a Category.",
+    description: "Blacklist a user.",
   })
-  async announce(
+  async toggleblacklist(
     @SlashOption({
       type: ApplicationCommandOptionType.String,
-      description: "The title",
-      name: "title",
+      description: "The User",
+      name: "userid",
       required: true,
-      maxLength: 238,
     })
-    title: string,
-    @SlashOption({
-      type: ApplicationCommandOptionType.String,
-      description: "The description",
-      name: "description",
-      maxLength: 4095,
-    })
-    description: string,
+    userid: string,
     interaction: CommandInteraction
   ) {
+    await interaction.deferReply();
+    var result = await this.globalConfigService.blacklistUser(userid)
+    await interaction.editReply("The user is now " + result.blacklisted[userid] ? "Banned" : "Unbanned");
+  }
+
+  @Slash({
+    description: "Announce Something!",
+  })
+  async announce(interaction: CommandInteraction) {
+    var modal = new ModalBuilder()
+      .setTitle("Details about a message")
+      .setCustomId("announcement-submit");
+    // Create text input fields
+    const titleComponent = new TextInputBuilder()
+      .setCustomId("title")
+      .setLabel("The Title")
+      .setStyle(TextInputStyle.Short)
+      .setMaxLength(238)
+      .setPlaceholder("Somewhat we can identify the Message")
+      .setRequired(true);
+
+    const descriptionComponent = new TextInputBuilder()
+      .setCustomId("description")
+      .setLabel("The description:")
+      .setMaxLength(4000)
+      .setPlaceholder(
+        "Write here your concern! ( Best with a screenshot! [Upload it somewhere])"
+      )
+      .setStyle(TextInputStyle.Paragraph);
+
+    const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      titleComponent
+    );
+
+    const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      descriptionComponent
+    );
+
+    modal.addComponents(row1, row2);
+    await interaction.showModal(modal);
+  }
+
+  @ModalComponent({ id: "announcement-submit" })
+  async announcement(interaction: ModalSubmitInteraction) {
+    const [title, description] = ["title", "description"].map((id) =>
+      interaction.fields.getTextInputValue(id)
+    );
     await interaction.deferReply({ ephemeral: true });
 
     var embed = new EmbedBuilder();
-    embed.addFields({name: "BOT Announcement: " + title, value: description});
-    embed.setAuthor({
-      name: interaction.user.username,
-      iconURL: interaction.user.displayAvatarURL(),
-    });
-    embed.setColor("Gold")
+    embed.setTitle("BOT Announcement: " + title);
+    embed.setDescription(description);
+    embed.setColor("Gold");
     await this.syncModeration.sendToAllChannels(undefined, { embeds: [embed] });
 
     await interaction.editReply("Successfully announced!");
