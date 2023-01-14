@@ -167,7 +167,7 @@ class syncAdministration {
   ) {
     await interaction.deferReply();
     var result = await this.globalConfigService.blacklistUser(userid)
-    await interaction.editReply("The user is now " + result.blacklisted[userid] ? "Banned" : "Unbanned");
+    await interaction.editReply("The user is now " + (result.blacklisted[userid] ? "Banned" : "Unbanned"));
   }
 
   @Slash({

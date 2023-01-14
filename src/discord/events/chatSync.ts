@@ -44,10 +44,17 @@ export class chatSync {
     ) {
       return;
     }
-    if((await this.globalConfigService.getOrCreate()).blacklisted[message.author.id]){
+    var config = await this.guildConfig.getOrCreate(message.guildId!);
+    var foundChannel = config.channels[message.channelId];
+    if (!foundChannel) return;
+    var category = await this.guildConfig.getByCategoryId(
+      foundChannel.category
+    );
+
+    var globalConf = await this.globalConfigService.getOrCreate()
+    if(globalConf.blacklisted[message.author.id] || await this.globalConfigService.isBlacklistedText(message.content) && category?.name !== "Self Promotion"){
       return
     }
-    var config = await this.guildConfig.getOrCreate(message.guildId!);
     if (
       !config ||
       config.banned ||
@@ -58,12 +65,7 @@ export class chatSync {
       return;
     }
 
-    var foundChannel = config.channels[message.channelId];
-    if (!foundChannel) return;
 
-    var category = await this.guildConfig.getByCategoryId(
-      foundChannel.category
-    );
     var phishingresult = await this.phishingService.checkForPhishing(message);
     if (phishingresult === true) {
       var logchannel = (await bot.channels.fetch(

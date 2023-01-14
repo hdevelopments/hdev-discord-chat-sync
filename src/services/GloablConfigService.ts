@@ -33,6 +33,14 @@ class GlobalConfigService {
     await this.GlobalConfigRepo.save(config);
     return config;
   }
+
+  async isBlacklistedText(text: string){
+    var config = await this.getOrCreate()
+    return config.blacklistText.find(x => {
+        return text.match(RegExp(x))?.length !== undefined
+    }) !== undefined
+  }
 }
+
 
 export default GlobalConfigService;

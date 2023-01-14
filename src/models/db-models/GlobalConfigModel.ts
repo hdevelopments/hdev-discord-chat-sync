@@ -5,4 +5,6 @@ import BaseModel from "./BaseModel";
 export default class globalConfigModel extends BaseModel {
   @Field()
   blacklisted: {[key:string]:boolean} = {}
+  @Field()
+  blacklistText: string[] = []
 }
