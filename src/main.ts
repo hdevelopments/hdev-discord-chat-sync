@@ -19,10 +19,8 @@ export const bot = new Client({
   // Discord intents
   intents: [
     IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
-    IntentsBitField.Flags.GuildPresences,
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.DirectMessages,

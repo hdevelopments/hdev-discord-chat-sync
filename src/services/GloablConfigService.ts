@@ -25,7 +25,7 @@ class GlobalConfigService {
     await this.GlobalConfigRepo.save(config);
     return config;
   }
-  
+
   async unBlacklistUser(user: string) {
     var config = await this.getOrCreate();
     config.blacklisted[user] = false;
@@ -34,13 +34,14 @@ class GlobalConfigService {
     return config;
   }
 
-  async isBlacklistedText(text: string){
-    var config = await this.getOrCreate()
-    return config.blacklistText.find(x => {
-        return text.match(RegExp(x, "gim"))?.length !== undefined
-    }) !== undefined
+  async isBlacklistedText(text: string) {
+    var config = await this.getOrCreate();
+    return (
+      config.blacklistText.find(
+        (x) => text.match(RegExp(x, "gim"))?.length !== undefined
+      ) !== undefined
+    );
   }
 }
-
 
 export default GlobalConfigService;
