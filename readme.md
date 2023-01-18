@@ -34,6 +34,8 @@ Discord Chat Sync is a Discord bot that syncs up channels between different serv
 
 You can invite the public instance of the bot by clicking [here](https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands).
 
+For Setup Help use `/info` or go to the Support Server and ask there!
+
 #### Permissions For The Public Bot
 <details><summary><b>Embed Links</b></summary>
 This is required to sync links between servers
