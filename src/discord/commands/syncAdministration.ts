@@ -83,7 +83,7 @@ class syncAdministration {
     found.vip = !found.vip;
     await this.guildConfigService.save(found);
 
-    await interaction.editReply("Successfully toggled the ban!");
+    await interaction.editReply("Successfully toggled a VIP!");
   }
 
   @Slash({

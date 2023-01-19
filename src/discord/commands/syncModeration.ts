@@ -120,7 +120,7 @@ class syncModeration {
       channel: setupData,
       guild: interaction.guildId!,
       configs: {},
-      lastMessage: Date.now(),
+      lastMessages: {},
     };
     await this.guildConfigService.save(data);
 

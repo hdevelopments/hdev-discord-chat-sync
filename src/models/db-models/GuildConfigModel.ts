@@ -22,7 +22,7 @@ export default class guildConfig extends BaseModel {
       channel: string;
       category: string;
       configs: {[key: string]: any}
-      lastMessage?: number;
+      lastMessages: {[key: string]: number | undefined};
     };
   } = {};
 }

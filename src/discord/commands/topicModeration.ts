@@ -65,7 +65,7 @@ class topicModeration {
         channel: channel.id,
         guild: interaction.guildId!,
         configs: {},
-        lastMessage: Date.now(),
+        lastMessages: {},
       };
 
       await this.guildConfigService.save(data);

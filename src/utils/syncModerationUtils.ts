@@ -250,6 +250,11 @@ export default class syncUtils {
                 : [],
           });
         } catch (exc: any) {
+          console.log("Failed to Send Message in ");
+          console.log(message.guild?.name);
+          console.log(message.guildId);
+          console.log(message.author.username);
+          console.log(message.author.id);
           console.log(exc);
         }
       } else {
@@ -299,8 +304,15 @@ export default class syncUtils {
                     ]
                   : [],
             });
-        } catch(exc) {
-          console.log(exc)
+        } catch (exc) {
+          console.log("Failed to Send Message in ");
+          console.log(message.guild?.name);
+          console.log(message.guildId);
+          console.log(message.author.username);
+          console.log(message.author.id);
+          console.log("Failed to Send Message in ");
+
+          console.log(exc);
         }
       }
     });

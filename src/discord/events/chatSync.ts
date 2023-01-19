@@ -10,13 +10,17 @@ import {
   TextInputBuilder,
   TextInputStyle,
   Events,
-  Message,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
 import syncUtils from "../../utils/syncModerationUtils";
 import { Phishing } from "./anti-phishing";
 import GlobalConfigService from "../../services/GloablConfigService";
+import Filter from "bad-words"
+var profanityfilter = new Filter()
+
+profanityfilter.addWords(...["fuck you", "fuc u", "fuck u"])
+
 @Discord()
 export class chatSync {
   @Inject()
@@ -50,10 +54,18 @@ export class chatSync {
     var category = await this.guildConfig.getByCategoryId(
       foundChannel.category
     );
-
-    var globalConf = await this.globalConfigService.getOrCreate()
-    if(globalConf.blacklisted[message.author.id] || await this.globalConfigService.isBlacklistedText(message.content) && category?.name !== "Self Promotion"){
-      return
+    if (typeof foundChannel.lastMessages === "number" || !foundChannel.lastMessages) {
+      foundChannel.lastMessages = {};
+      config.channels[message.channelId] = foundChannel;
+      await this.guildConfig.save(config);
+    }
+    var globalConf = await this.globalConfigService.getOrCreate();
+    if (
+      globalConf.blacklisted[message.author.id] || profanityfilter.isProfane(message.content) ||
+      ((await this.globalConfigService.isBlacklistedText(message.content)) &&
+        category?.name !== "Self Promotion")
+    ) {
+      return;
     }
     if (
       !config ||
@@ -64,7 +76,6 @@ export class chatSync {
     ) {
       return;
     }
-
 
     var phishingresult = await this.phishingService.checkForPhishing(message);
     if (phishingresult === true) {
@@ -87,23 +98,27 @@ export class chatSync {
       }
       return;
     }
+
     if (
-      category?.password &&
-      config.guild !== "995759386142179358" &&
+      !category?.password &&
       !config.vip &&
-      Date.now() - (foundChannel.lastMessage || 0) < 500
+      Date.now() - (foundChannel.lastMessages[message.author.id] || 0) < 1000
     ) {
-      message.channel
-        .send("Toooooo fast cowboy! (" + message.author.toString() + ")")
-        .then((x) => {
-          setTimeout(() => {
-            x.delete().catch((x) => {});
-          }, 5000);
-        });
+      foundChannel.lastMessages[message.author.id] = Date.now();
+      message.react("❌").catch(() => {
+        message.channel
+          .send({ content: `${message.author.toString()} - Please dont spam!` })
+          .then((x) => x.delete().catch((x) => {}))
+          .catch((x) => {
+            message.member?.createDM(true).then((x) => {
+              x.send("Dont Spam in Chat!").catch((x) => {});
+            });
+          });
+      });
       return;
     }
     await this.syncUtils.sendToAllChannels(foundChannel.category, message);
-    foundChannel.lastMessage = Date.now();
+    foundChannel.lastMessages[message.author.id] = Date.now();
     this.guildConfig.save(config);
   }
 
