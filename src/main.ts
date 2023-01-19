@@ -1,6 +1,12 @@
 import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
-import { Interaction, Message, Partials, Events } from "discord.js";
+import {
+  Interaction,
+  Message,
+  Partials,
+  Events,
+  ActivitiesOptions,
+} from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client, DIService, typeDiDependencyRegistryEngine } from "discordx";
 import Config from "./discordConfig";
@@ -34,19 +40,21 @@ export const bot = new Client({
     prefix: "!",
   },
 });
+
 function syncActivities() {
-  const activities = [
+  const botActivities: ActivitiesOptions[] = [
     {
       name: `Chatting with: ${bot.guilds.cache.size} guilds`,
     },
     {
-      name: `Support: https://discord.gg/5Nxm6peEt4`,
+      name: `Support: discord.gg/hdev`,
+    },
+    {
+      name: `Check out BytesToBit!: discord.gg/bytestobits-coding-614895425639546881`,
     },
   ];
 
-  bot.user?.setPresence({
-    activities: [activities[Math.floor(Math.random() * activities.length)]],
-  });
+  bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
 }
 bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
@@ -69,7 +77,7 @@ bot.once(Events.ClientReady, async () => {
   syncActivities();
   setInterval(() => {
     syncActivities();
-  }, 30 * 1000);
+  }, 15 * 1000);
   await discords.syncUp();
   setInterval(async () => {
     await discords.syncUp();

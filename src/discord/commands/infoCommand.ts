@@ -67,10 +67,18 @@ class infoCommand {
       .setURL(
         "https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands"
       );
+
+    const affiliateBtn = new ButtonBuilder()
+      .setLabel("Check out BytesToBits!")
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://discord.gg/bytestobits-coding-614895425639546881");
     var row =
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        shareBtn
+        shareBtn, affiliateBtn
       );
-    await interaction.editReply({ embeds: [embed, embedTwo], components: [row] });
+    await interaction.editReply({
+      embeds: [embed, embedTwo],
+      components: [row],
+    });
   }
 }
