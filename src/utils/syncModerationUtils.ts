@@ -251,24 +251,6 @@ export default class syncUtils {
           });
         } catch (exc: any) {
           console.log(exc);
-          try {
-            channel.send({
-              embeds: [guildEmbed],
-              components:
-                guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
-                x.configs["noButtons"]?.toLowerCase() !== "true"
-                  ? []
-                  : [row],
-              allowedMentions: {
-                repliedUser: false,
-                parse: [],
-                roles: [],
-                users: [],
-              },
-            });
-          } catch {
-            console.log("Failed 2nd Timed No Retry");
-          }
         }
       } else {
         try {
@@ -317,46 +299,8 @@ export default class syncUtils {
                     ]
                   : [],
             });
-        } catch {
-          try {
-            if (message.content)
-              channel.send({
-                content:
-                  (message.member?.nickname || message.author.username) +
-                  ": " +
-                  message.content,
-                components:
-                  guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
-                  x.configs["noButtons"]?.toLowerCase() === "true"
-                    ? []
-                    : [rowForGuild],
-                allowedMentions: {
-                  repliedUser: false,
-                  parse: [],
-                  roles: [],
-                  users: [],
-                },
-              });
-            if (
-              message.attachments.size > 0 &&
-              foundCategory?.configs["attachments"]?.toLowerCase() === "true"
-            ) {
-              channel
-                .send({
-                  files: [
-                    ...message.attachments.map((val) => {
-                      return new AttachmentBuilder(val.attachment, {
-                        description: val.description || undefined,
-                        name: val.name || undefined,
-                      });
-                    }),
-                  ],
-                })
-                .catch((x) => {});
-            }
-          } catch {
-            console.log("Second Try wasnt Successfull no Retry");
-          }
+        } catch(exc) {
+          console.log(exc)
         }
       }
     });
