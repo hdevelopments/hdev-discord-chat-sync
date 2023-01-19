@@ -1,6 +1,6 @@
 # Affiliates:
 
-## **BytesToBit Discord: https://discord.gg/bytestobits-coding-614895425639546881 (Check them out!)**
+## **[BytesToBit](https://discord.gg/bytestobits-coding-614895425639546881) (Check them out!)**
 <br>
 
 # Support Discord:
