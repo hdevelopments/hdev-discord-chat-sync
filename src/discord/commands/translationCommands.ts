@@ -176,8 +176,6 @@ export class translateCommands {
     }
     var embed = new EmbedBuilder();
     var translatedText = await translate(text, { from: "auto", to: to });
-    console.log("TEST")
-    console.log(translatedText)
     embed.setTitle("Translated!");
     embed.setDescription("text" in translatedText ? translatedText.text.toString() : "To Big Text!");
 
