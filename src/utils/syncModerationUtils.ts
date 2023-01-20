@@ -156,8 +156,9 @@ export default class syncUtils {
       text = undefined;
     }
     var refText: string;
-    var referenceEmbed = new EmbedBuilder();
+    var referenceEmbed: EmbedBuilder
     if ("member" in message && message.reference) {
+      referenceEmbed = new EmbedBuilder()
       var ref = await message.fetchReference();
       var refContent = ref.content.replaceAll(/(Replied to.*:.\n>)/gim, "");
       referenceEmbed.setDescription(
