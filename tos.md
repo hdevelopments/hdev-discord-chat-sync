@@ -4,7 +4,7 @@
 **The Bot**: @Hedges Chatter#6305 \
 **Support Server/Guild**:  https://discord.gg/hdev 
 
-The TOS of Hedges Chatter are simple!
+The TOS of Hedges Chatter is simple!
 
 In their roots they build up on the Discord TOS and Discord Guidelines. \
 (https://discord.com/terms and https://discord.com/guidelines)
