@@ -14,7 +14,6 @@ import { ObjectID } from "ts-mongodb-orm";
 import { Inject, Service } from "typedi";
 import bot from "../main";
 import GuildConfigService from "../services/GuildConfigService";
-import GlobalConfigService from "../services/GloablConfigService";
 export async function asyncForEach<T>(
   array: T[],
   callback: (value: T, index: number, array: any[]) => unknown
@@ -156,6 +155,61 @@ export default class syncUtils {
     if (text === "") {
       text = undefined;
     }
+    var refText: string;
+    var referenceEmbed = new EmbedBuilder();
+    if ("member" in message && message.reference) {
+      var ref = await message.fetchReference();
+      var refContent = ref.content.replaceAll(/(Replied to.*:.\n>)/gim, "");
+      referenceEmbed.setDescription(
+        `Replied to:
+            > ${
+              refContent.replace(/\n|\r/g, "").substring(0, 50) +
+              (ref.embeds.length > 0
+                ? ref.embeds[0].description
+                  ? " [Embeds] " +
+                    (ref.embeds[0].description.startsWith("Replied to")
+                      ? ref.embeds[1].description
+                          ?.replace(/\n|\r/g, "")
+                          .substring(0, 50)
+                      : ref.embeds[0].description
+                          ?.replace(/\n|\r/g, "")
+                          .substring(0, 50))
+                  : ""
+                : "") +
+              (ref.attachments.size > 0 ? " [Files]" : "") +
+              "..."
+            }
+             `
+      );
+      referenceEmbed.setFooter({
+        text: message.member?.displayName || message.author.username,
+        iconURL:
+          message.member?.avatarURL() ||
+          message.author.avatarURL() ||
+          message.author.defaultAvatarURL,
+      });
+      var ref = await message.fetchReference();
+      refText =
+        `Replied to ${
+          message.member?.displayName || message.author.username
+        }: \n> ${
+          refContent.replace(/\n|\r/g, "").substring(0, 50) +
+          (ref.embeds.length > 0
+            ? ref.embeds[0].description
+              ? " [Embeds] " +
+                (ref.embeds[0].description.startsWith("Replied to")
+                  ? ref.embeds[1].description
+                      ?.replace(/\n|\r/g, "")
+                      .substring(0, 50)
+                  : ref.embeds[0].description
+                      ?.replace(/\n|\r/g, "")
+                      .substring(0, 50))
+              : ""
+            : "") +
+          (ref.attachments.size > 0 ? " [Files]" : "") +
+          "..."
+        } \n` + text;
+    }
     allChannels.forEach(async (x, i) => {
       if (
         !x.channel ||
@@ -217,6 +271,14 @@ export default class syncUtils {
         rowForGuild.addComponents(links);
       }
       guildEmbed.setDescription(text || null);
+      var files = [
+        ...message.attachments.map((val) => {
+          return new AttachmentBuilder(val.attachment, {
+            description: val.description || undefined,
+            name: val.name || undefined,
+          });
+        }),
+      ];
       if (
         guildConfig.configs["type"] !=
           "Webhook ( Small, it does need the Webhook permission! )" &&
@@ -225,7 +287,7 @@ export default class syncUtils {
       ) {
         try {
           await channel.send({
-            embeds: [guildEmbed],
+            embeds: [referenceEmbed, guildEmbed],
             components:
               guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
               x.configs["noButtons"]?.toLowerCase() === "true"
@@ -239,14 +301,7 @@ export default class syncUtils {
             },
             files:
               foundCategory?.configs["attachments"]?.toLowerCase() === "true"
-                ? [
-                    ...message.attachments.map((val) => {
-                      return new AttachmentBuilder(val.attachment, {
-                        description: val.description || undefined,
-                        name: val.name || undefined,
-                      });
-                    }),
-                  ]
+                ? files
                 : [],
           });
         } catch (exc: any) {
@@ -269,7 +324,7 @@ export default class syncUtils {
             }));
           if (text)
             webhook.send({
-              content: text,
+              content: refText || text,
               components:
                 guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
                 x.configs["noButtons"]?.toLowerCase() === "true"
@@ -294,14 +349,7 @@ export default class syncUtils {
               },
               files:
                 foundCategory?.configs["attachments"]?.toLowerCase() === "true"
-                  ? [
-                      ...message.attachments.map((val) => {
-                        return new AttachmentBuilder(val.attachment, {
-                          description: val.description || undefined,
-                          name: val.name || undefined,
-                        });
-                      }),
-                    ]
+                  ? files
                   : [],
             });
         } catch (exc) {
