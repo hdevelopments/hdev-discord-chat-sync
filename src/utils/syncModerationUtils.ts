@@ -287,7 +287,7 @@ export default class syncUtils {
       ) {
         try {
           await channel.send({
-            embeds: [referenceEmbed, guildEmbed],
+            embeds: referenceEmbed ? [referenceEmbed, guildEmbed] : [guildEmbed],
             components:
               guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
               x.configs["noButtons"]?.toLowerCase() === "true"
