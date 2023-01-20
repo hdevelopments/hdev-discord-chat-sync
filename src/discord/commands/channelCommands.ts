@@ -128,6 +128,9 @@ class channelCommands {
       interaction.editReply("Sorry the choosen channel isnt a sync channel!")
       return
     }
+    if(!foundchannel.configs){
+      foundchannel.configs = {}
+    }
     foundchannel.configs[option] = newValue
     await this.guildConfigService.save(config);
     await interaction.editReply("Success!");
