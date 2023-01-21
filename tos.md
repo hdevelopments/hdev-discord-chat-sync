@@ -12,7 +12,7 @@ In their roots they build up on the Discord TOS and Discord Guidelines. \
 Sumarized:
 
 > § 1. Respect everybody and be kind in any way or form! \
-> > § 1.1 Harassment is not tolerated \
+> > § 1.1 Harassment / Bullying / Insulting is not tolerated \
 > > § 1.2 Harm / Self-Harm is not tolerated in any way \
 > > § 1.3 Any form of "Doxing"/leaking sensitive data is not tolerated in any form! \
 > § 2. Be honest \
@@ -32,6 +32,6 @@ On Top of that:
 
 The bot syncs only User generated text! So Bot messages/interactions are ignored. \
 The Bot doesnt generate any content. It broadcasts User generated content and because of that, every content in any way or form is the original owners property. \
-We dont take any responsibility of what a user "broadcasts" over any synchronized channels!
+We dont take any responsibility of what a user "broadcasts" over any synchronized channels! We will take actions to hinder any further TOS breaking by either blocking messages from that User or the whole Guild!
 
 Everyone using Hedges Chatter must comply with those rules!

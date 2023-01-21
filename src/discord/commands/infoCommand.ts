@@ -71,7 +71,7 @@ class infoCommand {
     const affiliateBtn = new ButtonBuilder()
       .setLabel("Check out BytesToBits!")
       .setStyle(ButtonStyle.Link)
-      .setURL("https://discord.gg/bytestobits/");
+      .setURL("https://discord.gg/bytestobits");
     var row =
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         shareBtn, affiliateBtn

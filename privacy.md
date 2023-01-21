@@ -4,7 +4,7 @@
 **The Bot**: @Hedges Chatter#6305 \
 **Support Server/Guild**: https://discord.gg/hdev 
 
-The Privacy Policy of Hedges Chatter are simple!
+The Privacy Policy of Hedges Chatter is simple!
 
 In their roots they build up on the Discord Privacy Policy because it uses its Platform and its restrictions. \
 (https://discord.com/privacy)
