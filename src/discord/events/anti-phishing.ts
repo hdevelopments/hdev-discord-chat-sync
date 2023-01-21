@@ -6,7 +6,7 @@ import { Service } from "typedi";
 @Service()
 export class Phishing {
   constructor() {}
-  private check(url: string) {
+  private check(url: string, fullUrl: string) {
     var checksPromises = [];
 
     checksPromises.push(
@@ -19,7 +19,7 @@ export class Phishing {
           .then(async (x: phishingResponse) => {
             if (x.category !== "safe") {
               res({ result: true, url: url });
-            }else{
+            } else {
               res({ result: false, url: url });
             }
           })
@@ -43,6 +43,29 @@ export class Phishing {
           .catch((x) => {
             res({ result: false, url: url });
             // Ignore
+          });
+      })
+    );
+    checksPromises.push(
+      new Promise((res, rej) => {
+        const params = new URLSearchParams();
+        params.append("url", fullUrl);
+        axios
+          .post("https://urlhaus-api.abuse.ch/v1/url/", params)
+          .then((x) => {
+            return x.data;
+          })
+          .then((x) => {
+            res({
+              result:
+                x &&
+                x.query_status !== "no_results" &&
+                x.url_status === "online",
+              url: url,
+            });
+          })
+          .catch((x) => {
+            res({ result: false, url: url });
           });
       })
     );
@@ -72,11 +95,12 @@ export class Phishing {
 
     var promises: Promise<unknown>[] = [];
     links.forEach((x) => {
+      var fullUrl = x[0];
       var url = x[0].substring(x[0].toLowerCase().indexOf("://") + 3).trim();
 
       url = url.substring(0, url.indexOf("/") || url.length);
 
-      promises.push(this.check(url));
+      promises.push(this.check(url, fullUrl));
     });
     var result = await Promise.allSettled(promises);
 
@@ -85,7 +109,7 @@ export class Phishing {
       var found = values.find((data: any) => {
         return (data as { result: boolean; url: string }).result;
       }) as { result: boolean; url: string } | undefined;
-      return found !== undefined && found.result || false;
+      return (found !== undefined && found.result) || false;
     } catch (x) {
       console.log(x);
       return false;
