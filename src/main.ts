@@ -50,7 +50,7 @@ function syncActivities() {
       name: `Support: discord.gg/hdev`,
     },
     {
-      name: `Check out BytesToBit!: discord.gg/bytestobits-coding-614895425639546881`,
+      name: `Check out BytesToBit!: discord.gg/bytestobits`,
     },
   ];
 
