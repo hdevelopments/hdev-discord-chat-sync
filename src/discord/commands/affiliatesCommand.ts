@@ -15,7 +15,7 @@ const affiliates = [
 
   🔗 Check us out:
           => 🌐 Website: https://bytestobits.dev/`,
-    invite: "https://discord.gg/bytestobits-coding-614895425639546881",
+    invite: "https://discord.gg/bytestobits/",
     image:
       "https://cdn.discordapp.com/attachments/816811551079923763/982460251506880552/BytesToBitsBanner.png",
   },

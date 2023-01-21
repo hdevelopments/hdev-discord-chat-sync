@@ -156,9 +156,9 @@ export default class syncUtils {
       text = undefined;
     }
     var refText: string;
-    var referenceEmbed: EmbedBuilder
+    var referenceEmbed: EmbedBuilder;
     if ("member" in message && message.reference) {
-      referenceEmbed = new EmbedBuilder()
+      referenceEmbed = new EmbedBuilder();
       var ref = await message.fetchReference();
       var refContent = ref.content.replaceAll(/(Replied to.*:.\n>)/gim, "");
       referenceEmbed.setDescription(
@@ -183,13 +183,12 @@ export default class syncUtils {
              `
       );
       referenceEmbed.setFooter({
-        text: message.member?.displayName || message.author.username,
+        text: ref.member?.displayName || ref.author.username,
         iconURL:
-          message.member?.avatarURL() ||
-          message.author.avatarURL() ||
-          message.author.defaultAvatarURL,
+          ref.member?.avatarURL() ||
+          ref.author.avatarURL() ||
+          ref.author.defaultAvatarURL,
       });
-      var ref = await message.fetchReference();
       refText =
         `Replied to ${
           message.member?.displayName || message.author.username
@@ -288,7 +287,9 @@ export default class syncUtils {
       ) {
         try {
           await channel.send({
-            embeds: referenceEmbed ? [referenceEmbed, guildEmbed] : [guildEmbed],
+            embeds: referenceEmbed
+              ? [referenceEmbed, guildEmbed]
+              : [guildEmbed],
             components:
               guildConfig.configs["noButtons"]?.toLowerCase() === "true" ||
               x.configs["noButtons"]?.toLowerCase() === "true"
