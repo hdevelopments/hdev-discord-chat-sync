@@ -30,6 +30,10 @@ On Top of that:
 > § 6. If someone notices a TOS breaking of a user, he can report the user on the Hedges Development Discord \
 > § 7. Guild Owners should care about their chats where the Bot is synchronising the chat. If the guild repeatedly breaks the TOS the whole Guild will be blacklisted. \
 
+Hedges Chatter is intended for use on the Discord platform. By using Hedges Chatter, you
+ agree to comply with Discord's terms of service and community 
+guidelines. By using Hedges Chatter, you also agree to our terms of service, and our [privacy policy](https://github.com/hdevelopments/hdev-discord-chat-sync/blob/main/privacy.md).
+\
 The bot syncs only User generated text! So Bot messages/interactions are ignored. \
 The Bot doesnt generate any content. It broadcasts User generated content and because of that, every content in any way or form is the original owners property. \
 We dont take any responsibility of what a user "broadcasts" over any synchronized channels! We will take actions to hinder any further TOS breaking by either blocking messages from that User or the whole Guild!
