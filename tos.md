@@ -39,3 +39,5 @@ The Bot doesnt generate any content. It broadcasts User generated content and be
 We dont take any responsibility of what a user "broadcasts" over any synchronized channels! We will take actions to hinder any further TOS breaking by either blocking messages from that User or the whole Guild!
 
 Everyone using Hedges Chatter must comply with those rules!
+
+Licence: https://github.com/hdevelopments/hdev-discord-chat-sync/blob/main/LICENSE (MIT)
