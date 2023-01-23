@@ -102,7 +102,7 @@ export class chatSync {
     if (
       !category?.password &&
       !config.vip &&
-      Date.now() - (foundChannel.lastMessages[message.author.id] || 0) < 1000
+      Date.now() - (foundChannel.lastMessages[message.author.id] || 0) < 750
     ) {
       foundChannel.lastMessages[message.author.id] = Date.now();
       message.react("❌").catch(() => {

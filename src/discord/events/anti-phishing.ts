@@ -46,6 +46,7 @@ export class Phishing {
           });
       })
     );
+    
     checksPromises.push(
       new Promise((res, rej) => {
         const params = new URLSearchParams();

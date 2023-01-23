@@ -51,7 +51,7 @@ export default class syncUtils {
         (!message.content || message.content.trim().length === 0) &&
         message.stickers.size === 0 &&
         message.attachments.size === 0 &&
-        foundCategory?.configs["attachments"]?.toLowerCase() === "true"
+        foundCategory?.configs["attachments"]?.toLowerCase() !== "true"
       )
         return;
 
