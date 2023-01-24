@@ -225,17 +225,17 @@ class syncAdministration {
         interaction.reply("GuildID or GuildName is required!")
         return
       }
-      interaction.deferReply({ephemeral: true})
+      await interaction.deferReply({ephemeral: true})
       if(guildId){
         try{
           let guild = await bot.guilds.fetch(guildId)
           let invite = await guild.invites.create(guild.channels.cache.find(x => x.isTextBased())?.id!, {unique: true})
           if(invite){
-            interaction.editReply(invite.url)
+            await interaction.editReply(invite.url)
           }
         }catch(exc){
           console.log(exc)
-          interaction.editReply("Error!")
+          await interaction.editReply("Error!")
         }
       }else{
         try{
@@ -243,12 +243,12 @@ class syncAdministration {
             x.name === guildName
           })
           if(!guild){
-            interaction.editReply("No Guild Found!")
+            await interaction.editReply("No Guild Found!")
             return
           }
           let invite = await guild.invites.create(guild.channels.cache.find(x => x.isTextBased())?.id!, {unique: true})
           if(invite){
-            interaction.editReply(invite.url)
+            await interaction.editReply(invite.url)
           }
         }catch(exc){
           console.log(exc)
