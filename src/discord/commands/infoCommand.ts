@@ -53,12 +53,12 @@ class infoCommand {
     embedTwo.addFields({
       name: "How to Start",
       value:
-        "> You can start syncing a chat Channel with:\n> **`/moderation setchannel channel:yourchannel`**\n> and then select your wanted topic!",
+        "> You can start syncing a chat Channel with:\n> **</moderation setchannel:1046757798005968946>**\n> and then select your wanted topic!",
     });
     embedTwo.addFields({
       name: "Create a private Topic",
       value:
-        "> You can easily create your private Topic with:\n> **`/topic create topic:mytopic password:1234`**\n> and then Join it on another or the same Server with: \n> **`/topic join topic:mytopic password:1234 channel:mychannel`**",
+        "> You can easily create your private Topic with:\n> **</topic create:1056205032074256414>**\n> and then Join it on another or the same Server with: \n> **</topic join:1056205032074256414>**",
     });
 
     const shareBtn = new ButtonBuilder()

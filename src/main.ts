@@ -37,7 +37,7 @@ export const bot = new Client({
   guards: [NoBot],
   // Configuration for @SimpleCommand
   simpleCommand: {
-    prefix: "!",
+    prefix: "hc!",
   },
 });
 

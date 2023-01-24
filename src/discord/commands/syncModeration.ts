@@ -13,6 +13,10 @@ import {
   Discord,
   Guard,
   SelectMenuComponent,
+  SimpleCommand,
+  SimpleCommandMessage,
+  SimpleCommandOption,
+  SimpleCommandOptionType,
   Slash,
   SlashChoice,
   SlashGroup,
@@ -66,9 +70,13 @@ class syncModeration {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply();
-    if((await this.guildConfigService.getOrCreate(interaction.id)).banned){
-      interaction.editReply("Your guild got banned! Please create a unbann request on the Support Server (see /info)")
-      return
+    if (
+      (await this.guildConfigService.getOrCreate(interaction.guildId!)).banned
+    ) {
+      interaction.editReply(
+        "Your guild got banned! Please create a unbann request on the Support Server (see /info)"
+      );
+      return;
     }
     var categories = await this.guildConfigService.getAllCategories();
 
@@ -94,6 +102,67 @@ class syncModeration {
       .editReply({
         components: [row],
         content: `Select the category you want!`,
+      })
+      .then((x) => {
+        this.setupData[x.id] = { channel: channel.id };
+      });
+  }
+
+  @SimpleCommand({
+    description: "Set the channel for chatting.",
+    directMessage: false,
+    name: "setchannel",
+  })
+  async setsimplechatchannel(
+    @SimpleCommandOption({
+      type: SimpleCommandOptionType.Channel,
+      description: "The Channel",
+      name: "channel",
+    })
+    channel: GuildTextBasedChannel | undefined,
+    message: SimpleCommandMessage
+  ) {
+    if (!message.message.guildId) return;
+    if (
+      (await this.guildConfigService.getOrCreate(message.message.guildId!))
+        .banned
+    ) {
+      message.message.reply(
+        "Your guild got banned! Please create a unbann request on the Support Server (see /info)"
+      );
+      return;
+    }
+
+    if (!channel) {
+      message.message.reply(
+        "You need to give me a channel! ( **ch!setchannel #yourchannel** )"
+      );
+      return;
+    }
+    var categories = await this.guildConfigService.getAllCategories();
+
+    // create menu for roles
+    const menu = new StringSelectMenuBuilder()
+      .addOptions(
+        ...categories
+          .filter((x) => !x.password)
+          .map((x) => ({
+            label: x.name + (x.nsfw ? " (NSFW)" : ""),
+            value: x._id.toString(),
+            description:
+              x.description &&
+              x.description + (x.nsfw ? " (possible NSFW)" : ""),
+          }))
+      )
+      .setCustomId("categories-menu");
+    const row =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        menu
+      );
+    message.message
+      .reply({
+        content: `Select the category you want!`,
+        components: [row],
       })
       .then((x) => {
         this.setupData[x.id] = { channel: channel.id };
@@ -177,8 +246,11 @@ class syncModeration {
     newValue: any,
     interaction: CommandInteraction
   ) {
-    if(!options[option].includes(newValue)) {
-    await interaction.reply({ ephemeral: true, content: "You need to select one of the given options!" });
+    if (!options[option].includes(newValue)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: "You need to select one of the given options!",
+      });
     }
     await interaction.deferReply({ ephemeral: true });
     var config = await this.guildConfigService.getOrCreate(

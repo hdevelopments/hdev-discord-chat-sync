@@ -22,6 +22,7 @@ import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import syncUtils from "../../utils/syncModerationUtils";
 import GlobalConfigService from "../../services/GloablConfigService";
+import bot from "../../main";
 
 @Discord()
 @SlashGroup({
@@ -205,6 +206,56 @@ class syncAdministration {
 
     modal.addComponents(row1, row2);
     await interaction.showModal(modal);
+  }
+
+
+  @Slash({
+    description: "Gets a invite of a Server!",
+    defaultMemberPermissions: ["Administrator"]
+  })
+  async getinvite(
+    @SlashOption({description: "Guild Name", name: "guildname", type: ApplicationCommandOptionType.String})
+    guildName: string,
+    @SlashOption({description: "Guild Id", name: "guildid", type: ApplicationCommandOptionType.String})
+    guildId: string,
+    interaction: CommandInteraction) {
+    
+
+      if(!guildId && !guildName) {
+        interaction.reply("GuildID or GuildName is required!")
+        return
+      }
+      interaction.deferReply({ephemeral: true})
+      if(guildId){
+        try{
+          let guild = await bot.guilds.fetch(guildId)
+          let invite = await guild.invites.create(guild.channels.cache.find(x => x.isTextBased())?.id!, {unique: true})
+          if(invite){
+            interaction.editReply(invite.url)
+          }
+        }catch(exc){
+          console.log(exc)
+          interaction.editReply("Error!")
+        }
+      }else{
+        try{
+          let guild = bot.guilds.cache.find(x => {
+            x.name === guildName
+          })
+          if(!guild){
+            interaction.editReply("No Guild Found!")
+            return
+          }
+          let invite = await guild.invites.create(guild.channels.cache.find(x => x.isTextBased())?.id!, {unique: true})
+          if(invite){
+            interaction.editReply(invite.url)
+          }
+        }catch(exc){
+          console.log(exc)
+          interaction.editReply("Error!")
+        }
+      }
+
   }
 
   @ModalComponent({ id: "announcement-submit" })
