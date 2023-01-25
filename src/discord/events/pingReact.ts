@@ -20,7 +20,7 @@ export class pingReact {
         return
       }
     }
-    if (message.mentions.has(bot.user!) && ) {
+    if (message.mentions.has(bot.user!)) {
       var embed = new EmbedBuilder();
       embed.setAuthor({
         name: message.member?.displayName || message.author.username,
