@@ -40,6 +40,11 @@ class infoCommand {
       value: "https://github.com/hdevelopments/hdev-discord-chat-sync",
       inline: true,
     });
+    embed.addFields({
+      name: "Guilds:",
+      value: bot.guilds.cache.size + "",
+      inline: true,
+    });
     embed.addFields({ name: "Ping", value: String(bot.ws.ping) + "ms" });
 
     var embedTwo = new EmbedBuilder();
