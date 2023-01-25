@@ -45,7 +45,11 @@ class infoCommand {
       value: bot.guilds.cache.size + "",
       inline: true,
     });
-    embed.addFields({ name: "Ping", value: String(bot.ws.ping) + "ms" });
+    embed.addFields({
+      name: "Ping",
+      value: String(bot.ws.ping) + "ms",
+      inline: true,
+    });
 
     var embedTwo = new EmbedBuilder();
 
@@ -54,7 +58,7 @@ class infoCommand {
       iconURL: interaction.user.avatarURL() || undefined,
     });
     embedTwo.setColor(Colors.Green);
-    embed.setDescription("Here is how you set up basic chatting!")
+    embed.setDescription("Here is how you set up basic chatting!");
     embedTwo.addFields({
       name: "How to Start",
       value: `> You can start syncing a chat Channel with:
