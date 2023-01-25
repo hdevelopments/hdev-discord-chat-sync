@@ -49,18 +49,28 @@ class infoCommand {
       iconURL: interaction.user.avatarURL() || undefined,
     });
     embedTwo.setColor(Colors.Green);
-
+    embed.setDescription("Here is how you set up basic chatting!")
     embedTwo.addFields({
       name: "How to Start",
-      value:
-        "> You can start syncing a chat Channel with:\n> **</moderation setchannel:1046757798005968946>**\n> and then select your wanted topic!",
+      value: `> You can start syncing a chat Channel with:
+        > **</moderation setchannel:1046757798005968946>**
+        > and then select your wanted topic!
+        > Keep in mind that the bot needs read and write permissions!
+        > (For Webhooks "Manage Webhook" Channel permission)
+        > You can change some settings over with </moderation set:1046757798005968946> for Global Settings or </chat set:1061680120521314364> for Chat bound settings`,
     });
     embedTwo.addFields({
       name: "Create a private Topic",
-      value:
-        "> You can easily create your private Topic with:\n> **</topic create:1056205032074256414>**\n> and then Join it on another or the same Server with: \n> **</topic join:1056205032074256414>**",
+      value: `> You can easily create your private Topic with:
+        > **</topic create:1056205032074256414>**\n> and then Join it on another or the same Server with:
+        > **</topic join:1056205032074256414>**`,
     });
-
+    embedTwo.addFields({
+      name: "Further Infos",
+      value: `> TOS and Privacy Policy:
+      > https://github.com/hdevelopments/hdev-discord-chat-sync
+      > If you use the Bot you agree with those!`,
+    });
     const shareBtn = new ButtonBuilder()
       .setLabel("Invite the Bot!")
       .setStyle(ButtonStyle.Link)
@@ -74,7 +84,8 @@ class infoCommand {
       .setURL("https://discord.gg/bytestobits");
     var row =
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        shareBtn, affiliateBtn
+        shareBtn,
+        affiliateBtn
       );
     await interaction.editReply({
       embeds: [embed, embedTwo],
