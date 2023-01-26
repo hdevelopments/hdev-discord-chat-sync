@@ -227,8 +227,8 @@ export class chatSync {
   }
   @ModalComponent({ id: "details-dummy" })
   async dummy(interaction: ButtonInteraction) {
-    interaction.deferReply();
-    interaction.deleteReply();
+    await interaction.deferReply({ephemeral: true});
+    await interaction.editReply("Ok")
   }
   @ButtonComponent({ id: "details-links" })
   async showLinks(interaction: ButtonInteraction) {
