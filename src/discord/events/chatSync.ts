@@ -19,7 +19,7 @@ import GlobalConfigService from "../../services/GloablConfigService";
 import Filter from "bad-words"
 var profanityfilter = new Filter()
 
-profanityfilter.addWords(...["fuck you", "fuc u", "fuck u"])
+profanityfilter.addWords(...["fuck you", "fuc u", "fuck u", "shut up", "shutup"])
 
 @Discord()
 export class chatSync {

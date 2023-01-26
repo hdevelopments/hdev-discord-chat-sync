@@ -191,7 +191,7 @@ export default class syncUtils {
       });
       refText =
         `Replied to ${
-          message.member?.displayName || message.author.username
+          ref.member?.displayName || ref.author.username
         }: \n> ${
           refContent.replace(/\n|\r/g, "").substring(0, 50) +
           (ref.embeds.length > 0
