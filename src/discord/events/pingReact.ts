@@ -43,7 +43,7 @@ export class pingReact {
       });
       embed.addFields({
         name: "Help Command:",
-        value: "</info:>",
+        value: "</info:1060278568447398009>",
         inline: true,
       });
       const shareBtn = new ButtonBuilder()
