@@ -7,7 +7,7 @@ import {
   EmbedBuilder,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Discord, Guard, Slash } from "discordx";
+import { Discord, Slash } from "discordx";
 import bot from "../../main";
 
 @Discord()

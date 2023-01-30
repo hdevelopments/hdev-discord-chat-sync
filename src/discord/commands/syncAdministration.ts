@@ -63,7 +63,7 @@ class syncAdministration {
     found.banned = !found.banned;
     await this.guildConfigService.save(found);
 
-    await interaction.editReply("Successfully toggled the ban!");
+    await interaction.editReply(`Successfully ${found.banned ? "banned" : "unbanned"} the ban!`);
   }
 
   @Slash({
@@ -84,7 +84,7 @@ class syncAdministration {
     found.vip = !found.vip;
     await this.guildConfigService.save(found);
 
-    await interaction.editReply("Successfully toggled a VIP!");
+    await interaction.editReply(`Successfully ${found.vip ? "enabled" : "disabled"} VIP for the Guild!`);
   }
 
   @Slash({
