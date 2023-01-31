@@ -285,11 +285,15 @@ class syncAdministration {
 
     configs.forEach(async (x) => {
       if (
-        Object.keys(x.channels).length === 0 &&
-        bot.guilds.cache.get(x.guild) === undefined
+        Object.keys(x.channels).length === 0 && bot.guilds.cache.get(x.guild) === undefined
       ) {
-        console.log(`Removing ${x.guild}`)
-        await this.guildConfigService.remove(x);
+        try{
+          await bot.guilds.fetch(x.guild)
+        }catch{
+          console.log(`Removing ${x.guild}`)
+          await this.guildConfigService.remove(x);
+        }
+        
       }
     });
 
