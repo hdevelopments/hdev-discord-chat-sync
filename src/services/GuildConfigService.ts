@@ -96,6 +96,10 @@ class GuildConfigService {
     return await this.GuildCategoryRepo.removeOne(category);
   }
 
+  async remove(config: guildConfig) {
+    return await this.GuildConfigRepo.removeOne(config);
+  }
+
   async getAllChannels() {
     return await this.GuildConfigRepo.filterMany("channels", (x) => x.exists());
   }

@@ -36,11 +36,10 @@ import bot from "../../main";
 @Guard(noDms)
 class syncAdministration {
   @Inject()
-  private guildConfigService: GuildConfigService
+  private guildConfigService: GuildConfigService;
 
   @Inject()
   private globalConfigService: GlobalConfigService;
-
 
   @Inject()
   private syncModeration: syncUtils;
@@ -63,7 +62,9 @@ class syncAdministration {
     found.banned = !found.banned;
     await this.guildConfigService.save(found);
 
-    await interaction.editReply(`Successfully ${found.banned ? "banned" : "unbanned"} the ban!`);
+    await interaction.editReply(
+      `Successfully ${found.banned ? "banned" : "unbanned"} the ban!`
+    );
   }
 
   @Slash({
@@ -84,7 +85,9 @@ class syncAdministration {
     found.vip = !found.vip;
     await this.guildConfigService.save(found);
 
-    await interaction.editReply(`Successfully ${found.vip ? "enabled" : "disabled"} VIP for the Guild!`);
+    await interaction.editReply(
+      `Successfully ${found.vip ? "enabled" : "disabled"} VIP for the Guild!`
+    );
   }
 
   @Slash({
@@ -125,7 +128,7 @@ class syncAdministration {
     );
     found.nsfw = nsfw === true;
     found.description = description;
-    found.configs["attachments"] = String(attachments)
+    found.configs["attachments"] = String(attachments);
     await this.guildConfigService.saveCategory(found);
     await interaction.editReply("Category successfully created!");
   }
@@ -167,8 +170,10 @@ class syncAdministration {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply();
-    var result = await this.globalConfigService.blacklistUser(userid)
-    await interaction.editReply("The user is now " + (result.blacklisted[userid] ? "Banned" : "Unbanned"));
+    var result = await this.globalConfigService.blacklistUser(userid);
+    await interaction.editReply(
+      "The user is now " + (result.blacklisted[userid] ? "Banned" : "Unbanned")
+    );
   }
 
   @Slash({
@@ -208,54 +213,87 @@ class syncAdministration {
     await interaction.showModal(modal);
   }
 
-
   @Slash({
     description: "Gets a invite of a Server!",
-    defaultMemberPermissions: ["Administrator"]
+    defaultMemberPermissions: ["Administrator"],
   })
   async getinvite(
-    @SlashOption({description: "Guild Name", name: "guildname", type: ApplicationCommandOptionType.String})
+    @SlashOption({
+      description: "Guild Name",
+      name: "guildname",
+      type: ApplicationCommandOptionType.String,
+    })
     guildName: string,
-    @SlashOption({description: "Guild Id", name: "guildid", type: ApplicationCommandOptionType.String})
+    @SlashOption({
+      description: "Guild Id",
+      name: "guildid",
+      type: ApplicationCommandOptionType.String,
+    })
     guildId: string,
-    interaction: CommandInteraction) {
-    
-
-      if(!guildId && !guildName) {
-        interaction.reply("GuildID or GuildName is required!")
-        return
-      }
-      await interaction.deferReply({ephemeral: true})
-      if(guildId){
-        try{
-          let guild = await bot.guilds.fetch(guildId)
-          let invite = await guild.invites.create(guild.channels.cache.find(x => x.isTextBased())?.id!, {unique: true})
-          if(invite){
-            await interaction.editReply(invite.url)
-          }
-        }catch(exc){
-          console.log(exc)
-          await interaction.editReply("Error!")
+    interaction: CommandInteraction
+  ) {
+    if (!guildId && !guildName) {
+      interaction.reply("GuildID or GuildName is required!");
+      return;
+    }
+    await interaction.deferReply({ ephemeral: true });
+    if (guildId) {
+      try {
+        let guild = await bot.guilds.fetch(guildId);
+        let invite = await guild.invites.create(
+          guild.channels.cache.find((x) => x.isTextBased())?.id!,
+          { unique: true }
+        );
+        if (invite) {
+          await interaction.editReply(invite.url);
         }
-      }else{
-        try{
-          let guild = bot.guilds.cache.find(x => {
-            x.name === guildName
-          })
-          if(!guild){
-            await interaction.editReply("No Guild Found!")
-            return
-          }
-          let invite = await guild.invites.create(guild.channels.cache.find(x => x.isTextBased())?.id!, {unique: true})
-          if(invite){
-            await interaction.editReply(invite.url)
-          }
-        }catch(exc){
-          console.log(exc)
-          interaction.editReply("Error!")
-        }
+      } catch (exc) {
+        console.log(exc);
+        await interaction.editReply("Error!");
       }
+    } else {
+      try {
+        let guild = bot.guilds.cache.find((x) => {
+          x.name === guildName;
+        });
+        if (!guild) {
+          await interaction.editReply("No Guild Found!");
+          return;
+        }
+        let invite = await guild.invites.create(
+          guild.channels.cache.find((x) => x.isTextBased())?.id!,
+          { unique: true }
+        );
+        if (invite) {
+          await interaction.editReply(invite.url);
+        }
+      } catch (exc) {
+        console.log(exc);
+        interaction.editReply("Error!");
+      }
+    }
+  }
 
+  @Slash({
+    description: "Clears the Database!",
+    defaultMemberPermissions: ["Administrator"],
+  })
+  async cleardb(interaction: CommandInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    var configs = await this.guildConfigService.getAllChannels();
+
+    configs.forEach(async (x) => {
+      if (
+        Object.keys(x.channels).length === 0 &&
+        bot.guilds.cache.get(x.guild) === undefined
+      ) {
+        console.log(`Removing ${x.guild}`)
+        await this.guildConfigService.remove(x);
+      }
+    });
+
+    await interaction.editReply("Success!")
   }
 
   @ModalComponent({ id: "announcement-submit" })
