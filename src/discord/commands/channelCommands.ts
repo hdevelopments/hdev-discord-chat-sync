@@ -1,5 +1,18 @@
-import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, EmbedBuilder, TextBasedChannel } from "discord.js";
-import { Discord, SlashGroup, Guard, Slash, SlashOption, SlashChoice } from "discordx";
+import {
+  ApplicationCommandOptionType,
+  AutocompleteInteraction,
+  CommandInteraction,
+  EmbedBuilder,
+  TextBasedChannel,
+} from "discord.js";
+import {
+  Discord,
+  SlashGroup,
+  Guard,
+  Slash,
+  SlashOption,
+  SlashChoice,
+} from "discordx";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
@@ -7,7 +20,7 @@ import { ObjectID } from "ts-mongodb-orm";
 import { asyncForEach } from "../../utils/syncModerationUtils";
 import bot from "../../main";
 
-const options: {[key: string] : string[]} = {
+const options: { [key: string]: string[] } = {
   ["noInvites"]: ["true", "false"],
   ["noEmbeddedLinks"]: ["true", "false"],
   ["type"]: [
@@ -15,7 +28,7 @@ const options: {[key: string] : string[]} = {
     "Webhook ( Small, it does need the Webhook permission! )",
   ],
   ["noButtons"]: ["true", "false"],
-}
+};
 
 @Discord()
 @SlashGroup({
@@ -114,24 +127,28 @@ class channelCommands {
     channel: TextBasedChannel,
     interaction: CommandInteraction
   ) {
-    if(!options[option].includes(newValue)) {
-    await interaction.reply({ ephemeral: true, content: "You need to select one of the given options!" });
+    if (!options[option].includes(newValue)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: "You need to select one of the given options!",
+      });
+      return;
     }
     await interaction.deferReply({ ephemeral: true });
     var config = await this.guildConfigService.getOrCreate(
       interaction.guildId!
     );
 
-    var foundchannel = config.channels[channel?.id || interaction.channelId]
+    var foundchannel = config.channels[channel?.id || interaction.channelId];
 
-    if(!foundchannel){
-      interaction.editReply("Sorry the choosen channel isnt a sync channel!")
-      return
+    if (!foundchannel) {
+      interaction.editReply("Sorry the choosen channel isnt a sync channel!");
+      return;
     }
-    if(!foundchannel.configs){
-      foundchannel.configs = {}
+    if (!foundchannel.configs) {
+      foundchannel.configs = {};
     }
-    foundchannel.configs[option] = newValue
+    foundchannel.configs[option] = newValue;
     await this.guildConfigService.save(config);
     await interaction.editReply("Success!");
   }
