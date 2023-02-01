@@ -11,7 +11,7 @@ BytesToBits is a community for developers, providing people with like-minded peo
 
 # Discord Chat Sync
 
-Discord Chat Sync is a Discord bot that syncs up channels between different servers and allows for secure communication between them.
+Hedges Chatter is a Discord bot that syncs up channels between different servers and allows for secure communication between them.
  * Cross server communication
  * Private and Public Topics!
  * In Private Topics you can Block servers
