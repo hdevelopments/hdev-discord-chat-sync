@@ -30,7 +30,7 @@ Hedges Chatter is not intended for use by children under the age of 13, and neit
 § 9. Changing of Policy:
 We reserve the right to make changes to this Policy at any time. Your continued use of Chatty following the posting of changes to this Policy will mean you accept those changes.
 
-> The Data that is used by the Bot is when he sends a message: \
+> The Data that is used by the Bot is when he sends a message (NOT SAVED IN ANY DATABASE): \
 > `Message Contents, Authors (Nick)Name, Authors Avatar, Authors UserID, File Attachements, Stickers, Emojis, Timestamp, the Guild (Id, Avatar, Name, Invite[Depending on the Config])`\
 
 > The Data that is save in a secure Database: \
