@@ -1,4 +1,6 @@
-## Legend:
+
+# Legend
+
 **We**: Hedges Development ( Team ) \
 **You**: The User \
 **The Bot**: @Hedges Chatter#6305 \
@@ -16,7 +18,7 @@ On top of that:
 > § 4. The Bot shouldnt be used for any kind of sharing of sensitive or private data (Passwords, Email, Contact details)
 
 § 5. Use of Information:
-The data we collect is used only to improve the performance of the bot, and no other use is made of it.
+The data we collect is used only to improve the performance of the bot, and no other use is made of it. For Security Reasons we scan every link for phishing. We do that over external APIs ( https://urlhaus-api.abuse.ch/, https://phish.sinking.yachts/, https://api.fishfish.gg)
 
 § 6. Sharing of Information:
 We do not share any personal information with third parties, unless required by law or with your express consent.
@@ -28,13 +30,12 @@ We take the security of your personal information seriously and take reasonable 
 Hedges Chatter is not intended for use by children under the age of 13, and neither is discord. We do not knowingly collect personal information from children under the age of 13. If a user is found out to be underage, we will promply delete all data we may have collected, and blacklist them from further use of the bot.
 
 § 9. Changing of Policy:
-We reserve the right to make changes to this Policy at any time. Your continued use of Chatty following the posting of changes to this Policy will mean you accept those changes.
+We reserve the right to make changes to this Policy at any time. Your continued use of Hedges Chatter following the posting of changes to this Policy will mean you accept those changes.
 
-> The Data that is used by the Bot is when he sends a message (NOT SAVED IN ANY DATABASE): \
+The Data that is used by the Bot is when he sends a message(NOT SAVED IN A DATABASE): \
 > `Message Contents, Authors (Nick)Name, Authors Avatar, Authors UserID, File Attachements, Stickers, Emojis, Timestamp, the Guild (Id, Avatar, Name, Invite[Depending on the Config])`\
-
-> The Data that is save in a secure Database: \
-> On setting a Chat up: `UserID, ChannelID, Topic, last Message Timestamp, GuildID` \
-> On changing a Setting: `The given Settingsname, the choosen value` \
+The Data that is save in a secure Database: \
+> On setting a Chat up(saved in a secure DB): `UserID, ChannelID, Topic, last Message Timestamp, GuildID` \
+> On changing a Setting(saved in a secure DB): `The given Settingsname, the choosen value` \
 
 For Privacy Issues contact me on Discord or On the Email: rooki@hdev.tech
