@@ -20,6 +20,7 @@ import Filter from "bad-words"
 var profanityfilter = new Filter()
 
 profanityfilter.addWords(...["fuck you", "fuc u", "fuck u", "shut up", "shutup", "stfu"])
+profanityfilter.removeWords(...["escalate"])
 
 @Discord()
 export class chatSync {

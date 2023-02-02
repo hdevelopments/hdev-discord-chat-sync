@@ -15,7 +15,7 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import express from "express";
 import { apirouter } from "./express/api/api";
-
+var memberCounts = 0;
 var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
   .setService(Service)
@@ -53,16 +53,20 @@ function syncActivities() {
       name: `Check out BytesToBit!: discord.gg/bytestobits`,
     },
     {
-      name: `with ${bot.users.cache.size} Members!`,
+      name: `with ${memberCounts} Members!`,
     },
   ];
 
-  bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
+  // bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
+  bot.user?.setActivity(botActivities[3]);
 }
 bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
-  await bot.guilds.fetch();
-
+  var guilds = await bot.guilds.fetch();
+  guilds.forEach(async (x) => {
+    var guild = await x.fetch();
+    memberCounts += guild.memberCount;
+  });
   // await bot.clearApplicationCommands();
   // await bot.clearApplicationCommands(...[
   //   "932286006156222495",
@@ -76,6 +80,15 @@ bot.once(Events.ClientReady, async () => {
   } catch (exc: any) {
     console.log(exc.rawError);
   }
+
+  setInterval(async () => {
+    memberCounts = 0;
+    var guilds = await bot.guilds.fetch();
+    guilds.forEach(async (x) => {
+      var guild = await x.fetch();
+      memberCounts += guild.memberCount;
+    });
+  }, 15 * 60 * 1000);
 
   syncActivities();
   setInterval(() => {
