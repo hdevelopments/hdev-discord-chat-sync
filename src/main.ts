@@ -52,6 +52,9 @@ function syncActivities() {
     {
       name: `Check out BytesToBit!: discord.gg/bytestobits`,
     },
+    {
+      name: `with ${bot.users.cache.size} Members!`,
+    },
   ];
 
   bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
