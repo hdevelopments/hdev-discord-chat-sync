@@ -18,7 +18,7 @@ On top of that:
 > § 4. The Bot shouldnt be used for any kind of sharing of sensitive or private data (Passwords, Email, Contact details)
 
 § 5. Use of Information:
-The data we collect is used only to improve the performance of the bot, and no other use is made of it. For Security Reasons we scan every link for phishing. We do that over external APIs ( https://urlhaus-api.abuse.ch/, https://phish.sinking.yachts/, https://api.fishfish.gg)
+The data we collect is used only to improve the performance of the bot, and no other use is made of it. For Security Reasons we scan every link for phishing. We do that over external APIs ( https://urlhaus-api.abuse.ch/, https://phish.sinking.yachts/ and https://api.fishfish.gg)
 
 § 6. Sharing of Information:
 We do not share any personal information with third parties, unless required by law or with your express consent.
