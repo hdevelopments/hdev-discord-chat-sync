@@ -57,8 +57,8 @@ function syncActivities() {
     },
   ];
 
-  // bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
-  bot.user?.setActivity(botActivities[3]);
+  bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
+  // bot.user?.setActivity(botActivities[3]);
 }
 bot.once(Events.ClientReady, async () => {
   // Make sure all guilds are cached
