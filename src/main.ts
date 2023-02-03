@@ -15,7 +15,7 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import express from "express";
 import { apirouter } from "./express/api/api";
-var memberCounts = 0;
+export var memberCounts = 0;
 var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
   .setService(Service)
@@ -57,7 +57,9 @@ function syncActivities() {
     },
   ];
 
-  bot.user?.setActivity(botActivities[Math.floor(Math.random() * botActivities.length)]);
+  bot.user?.setActivity(
+    botActivities[Math.floor(Math.random() * botActivities.length)]
+  );
   // bot.user?.setActivity(botActivities[3]);
 }
 bot.once(Events.ClientReady, async () => {

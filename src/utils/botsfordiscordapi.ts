@@ -1,6 +1,6 @@
 import axios from "axios";
 import Config from "../discordConfig";
-import bot from "../main";
+import bot, { memberCounts } from "../main";
 
 class discordsApi {
   async syncUp() {
@@ -22,9 +22,20 @@ class discordsApi {
         console.log("Synced with discords");
         console.log(x);
       })
-      .catch((x) => {
-        console.error(x);
-      });
+      .catch((x) => {});
+
+    axios
+      .post(`https://top.gg/api/bots/${bot.user?.id}/stats`, {
+        "server_count": memberCounts
+      })
+      .then((x) => {
+        return x.data;
+      })
+      .then((x) => {
+        console.log("Synced with Top.gg");
+        console.log(x);
+      })
+      .catch((x) => {});
   }
 }
 export default discordsApi;
