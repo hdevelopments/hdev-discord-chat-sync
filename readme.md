@@ -80,3 +80,5 @@ In the future, this will allow the bot to sync messages when setting up in a new
 
  [![Bots for Discord](https://discords.com/bots/api/bot/1046756800260735058/widget)](https://discords.com/bots/bots/1046756800260735058)
  [![Discord Bots](https://top.gg/api/widget/1046756800260735058.svg)](https://top.gg/bot/1046756800260735058)
+ [![Infinity Bot Listing](https://infinitybots.gg/bots/1046756800260735058/widget?size=large)](https://infinitybots.gg/bots/1046756800260735058/)
+ 
