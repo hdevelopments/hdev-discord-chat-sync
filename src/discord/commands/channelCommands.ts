@@ -19,16 +19,8 @@ import { noDms } from "../guards/noDms";
 import { ObjectID } from "ts-mongodb-orm";
 import { asyncForEach } from "../../utils/syncModerationUtils";
 import bot from "../../main";
+import { options } from "./syncModeration";
 
-const options: { [key: string]: string[] } = {
-  ["noInvites"]: ["true", "false"],
-  ["noEmbeddedLinks"]: ["true", "false"],
-  ["type"]: [
-    "Embed ( Big, Default )",
-    "Webhook ( Small, it does need the Webhook permission! )",
-  ],
-  ["noButtons"]: ["true", "false"],
-};
 
 @Discord()
 @SlashGroup({
@@ -100,7 +92,7 @@ class channelCommands {
   })
   async set(
     @SlashChoice(
-      ...Object.entries(options).map((data) => {
+      ...Object.entries(options).filter(x => !x[1].globalOnly).map((data) => {
         return { name: data[0], value: data[0] };
       })
     )
@@ -127,7 +119,7 @@ class channelCommands {
     channel: TextBasedChannel,
     interaction: CommandInteraction
   ) {
-    if (!options[option].includes(newValue)) {
+    if (!options[option].options.includes(newValue)) {
       await interaction.reply({
         ephemeral: true,
         content: "You need to select one of the given options!",
@@ -161,7 +153,7 @@ class channelCommands {
     }
 
     interaction.respond(
-      options[option].map((x) => {
+      options[option].options.map((x) => {
         return { name: x, value: x };
       })
     );

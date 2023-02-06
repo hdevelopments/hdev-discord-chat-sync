@@ -13,10 +13,6 @@ import {
   Discord,
   Guard,
   SelectMenuComponent,
-  SimpleCommand,
-  SimpleCommandMessage,
-  SimpleCommandOption,
-  SimpleCommandOptionType,
   Slash,
   SlashChoice,
   SlashGroup,
@@ -27,14 +23,19 @@ import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import syncUtils from "../../utils/syncModerationUtils";
 
-export const options: { [key: string]: string[] } = {
-  ["noInvites"]: ["true", "false"],
-  ["noEmbeddedLinks"]: ["true", "false"],
-  ["type"]: [
-    "Embed ( Big, Default )",
-    "Webhook ( Small, it does need the Webhook permission! )",
-  ],
-  ["noButtons"]: ["true", "false"],
+export const options: {
+  [key: string]: { globalOnly?: boolean; options: any[], helpText?: string };
+} = {
+  ["noInvites"]: { options: ["true", "false"] },
+  ["noEmbeddedLinks"]: { options: ["true", "false"] },
+  ["type"]: {
+    options: [
+      "Embed ( Big, Default )",
+      "Webhook ( Small, it does need the Webhook permission! )",
+    ],
+  },
+  ["noButtons"]: { options: ["true", "false"] },
+  ["memesChannel"]: { globalOnly: true, options: ["*"], helpText: "The Channel Id" },
 };
 
 @Discord()
@@ -185,7 +186,7 @@ class syncModeration {
     newValue: any,
     interaction: CommandInteraction
   ) {
-    if (!options[option].includes(newValue)) {
+    if (!options[option].options.includes(newValue) && !options[option].options.includes("*")) {
       await interaction.reply({
         ephemeral: true,
         content: "You need to select one of the given options!",
@@ -208,9 +209,16 @@ class syncModeration {
       interaction.respond([{ name: "please select a option!", value: "no" }]);
       return;
     }
-
+    if (options[option].options.includes("*")) {
+      interaction.respond(
+        options[option].options.map((x) => {
+          return { name: `Free Text (${options[option!].helpText})`, value: "*" };
+        })
+      );
+      return;
+    }
     interaction.respond(
-      options[option].map((x) => {
+      options[option].options.map((x) => {
         return { name: x, value: x };
       })
     );

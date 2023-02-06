@@ -15,6 +15,7 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import express from "express";
 import { apirouter } from "./express/api/api";
+
 export var memberCounts = 0;
 var discords = new discordsApi();
 DIService.engine = typeDiDependencyRegistryEngine
