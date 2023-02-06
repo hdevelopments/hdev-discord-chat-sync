@@ -85,7 +85,10 @@ class getMemes {
     interaction: CommandInteraction
   ) {
     await interaction.deferReply({ ephemeral: true });
-    if ((await this.guildConfigService.getOrCreate(interaction.guildId!)).banned) {
+    var guildCfg = await this.guildConfigService.getOrCreate(
+      interaction.guildId!
+    );
+    if (guildCfg.banned) {
       interaction.editReply(
         "Your guild got banned! Please create a unbann request on the Support Server (see /info)"
       );
@@ -136,19 +139,26 @@ class getMemes {
         interaction,
         firstData
       );
+
       const shareBtn = new ButtonBuilder()
         .setLabel("Share!")
         .setStyle(ButtonStyle.Primary)
         .setCustomId("share-meme");
-        const publish = new ButtonBuilder()
-        .setLabel("Publish!")
+      const publishBtn = new ButtonBuilder()
+        .setLabel("Publish! (Send in Channel)")
         .setStyle(ButtonStyle.Secondary)
         .setCustomId("publish-meme");
       var row =
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          shareBtn,
-          publish
+          shareBtn
         );
+
+      if (
+        !guildCfg.configs["memesChannel"] ||
+        guildCfg.configs["memesChannel"] === interaction.channelId
+      ) {
+        row.addComponents(publishBtn);
+      }
       payload.components = [row];
       interaction.editReply(payload);
       data = data.reverse() as Listing<Submission>;
@@ -223,11 +233,16 @@ class getMemes {
     var files = interaction.message.attachments.map(
       (x) => new AttachmentBuilder(x.attachment)
     );
-
-    await interaction.reply({
-      content: interaction.message.content,
-      embeds: interaction.message.embeds,
-      files: files,
-    });
+    var guildCfg = await this.guildConfigService.getOrCreate(
+      interaction.guildId!
+    );
+    var memesChannel = guildCfg.configs["memesChannel"];
+    if (!memesChannel || memesChannel === interaction.channelId) {
+      await interaction.reply({
+        content: interaction.message.content,
+        embeds: interaction.message.embeds,
+        files: files,
+      });
+    }
   }
 }
