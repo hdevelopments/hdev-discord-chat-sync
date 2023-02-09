@@ -15,6 +15,7 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import express from "express";
 import { apirouter } from "./express/api/api";
+import InfinityAutoPoster from "ibl-autopost";
 
 export var memberCounts = 0;
 var discords = new discordsApi();
@@ -64,6 +65,20 @@ function syncActivities() {
   // bot.user?.setActivity(botActivities[3]);
 }
 bot.once(Events.ClientReady, async () => {
+  if (!process.env.DEV) {
+    var poster = InfinityAutoPoster(process.env.INFINITY_BOT_API_TOKEN!, bot); // your discord.js or eris client
+
+    // Optional Logger
+    poster.on("error", (err) => {
+      console.log(err);
+    });
+    // Optional Logger
+    poster.on("posted", (stats) => {
+      console.log(
+        `Posted stats to the Infinity Bot List API | ${stats.servers} servers`
+      );
+    });
+  }
   // Make sure all guilds are cached
   var guilds = await bot.guilds.fetch();
   guilds.forEach(async (x) => {
