@@ -213,7 +213,7 @@ export default class syncUtils {
     allChannels.forEach(async (x, i) => {
       if (
         !x.channel ||
-        ("member" in message && x.channel === message.channelId)
+        "member" in message || "channelId" in message && x.channel === message.channelId
       )
         return;
 
