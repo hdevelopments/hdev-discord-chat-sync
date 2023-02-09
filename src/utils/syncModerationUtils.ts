@@ -190,9 +190,7 @@ export default class syncUtils {
           ref.author.defaultAvatarURL,
       });
       refText =
-        `Replied to ${
-          ref.member?.displayName || ref.author.username
-        }: \n> ${
+        `Replied to ${ref.member?.displayName || ref.author.username}: \n> ${
           refContent.replace(/\n|\r/g, "").substring(0, 50) +
           (ref.embeds.length > 0
             ? ref.embeds[0].description
@@ -213,7 +211,7 @@ export default class syncUtils {
     allChannels.forEach(async (x, i) => {
       if (
         !x.channel ||
-        "member" in message || "channelId" in message && x.channel === message.channelId
+        ("channelId" in message && x.channel === message.channelId)
       )
         return;
 
@@ -237,7 +235,9 @@ export default class syncUtils {
       }
       if (!channel) return;
       if (!("member" in message)) {
-        channel.send(message).catch(x => {console.log(x)});
+        channel.send(message).catch((x) => {
+          console.log(x);
+        });
         return;
       }
       var guildEmbed = new EmbedBuilder(embed.toJSON());
