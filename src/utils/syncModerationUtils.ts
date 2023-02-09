@@ -237,7 +237,7 @@ export default class syncUtils {
       }
       if (!channel) return;
       if (!("member" in message)) {
-        channel.send(message).catch(x => {});
+        channel.send(message).catch(x => {console.log(x)});
         return;
       }
       var guildEmbed = new EmbedBuilder(embed.toJSON());

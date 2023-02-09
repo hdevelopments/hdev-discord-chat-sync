@@ -10,17 +10,23 @@ import {
   TextInputBuilder,
   TextInputStyle,
   Events,
+  InteractionType,
+  MessageActionRowComponentBuilder,
+  ButtonStyle,
+  ButtonBuilder,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
 import syncUtils from "../../utils/syncModerationUtils";
 import { Phishing } from "./anti-phishing";
 import GlobalConfigService from "../../services/GloablConfigService";
-import Filter from "bad-words"
-var profanityfilter = new Filter()
+import Filter from "bad-words";
+var profanityfilter = new Filter();
 
-profanityfilter.addWords(...["fuck you", "fuc u", "fuck u", "shut up", "shutup", "stfu"])
-profanityfilter.removeWords(...["escalate"])
+profanityfilter.addWords(
+  ...["fuck you", "fuc u", "fuck u", "shut up", "shutup", "stfu"]
+);
+profanityfilter.removeWords(...["escalate"]);
 
 @Discord()
 export class chatSync {
@@ -55,14 +61,18 @@ export class chatSync {
     var category = await this.guildConfig.getByCategoryId(
       foundChannel.category
     );
-    if (typeof foundChannel.lastMessages === "number" || !foundChannel.lastMessages) {
+    if (
+      typeof foundChannel.lastMessages === "number" ||
+      !foundChannel.lastMessages
+    ) {
       foundChannel.lastMessages = {};
       config.channels[message.channelId] = foundChannel;
       await this.guildConfig.save(config);
     }
     var globalConf = await this.globalConfigService.getOrCreate();
     if (
-      globalConf.blacklisted[message.author.id] || profanityfilter.isProfane(message.content) ||
+      globalConf.blacklisted[message.author.id] ||
+      profanityfilter.isProfane(message.content) ||
       ((await this.globalConfigService.isBlacklistedText(message.content)) &&
         category?.name !== "Self Promotion")
     ) {
@@ -121,6 +131,49 @@ export class chatSync {
     await this.syncUtils.sendToAllChannels(foundChannel.category, message);
     foundChannel.lastMessages[message.author.id] = Date.now();
     this.guildConfig.save(config);
+  }
+
+  allowedCommands = [{ name: "time", bot: "1023653781398884431" }];
+
+  @On({ event: Events.MessageCreate, priority: 2 })
+  async handleInteraction([
+    message,
+  ]: ArgsOf<Events.MessageCreate>): Promise<void> {
+    var config = await this.guildConfig.getOrCreate(message.guildId!);
+    var foundChannel = config.channels[message.channelId];
+    if (!foundChannel) return;
+    if (
+      message.interaction &&
+      message.interaction.type === InteractionType.ApplicationCommand &&
+      this.allowedCommands.find(
+        (x) =>
+          x.name === message.interaction?.commandName &&
+          x.bot === message.author.id
+      )
+    ) {
+      setTimeout(async () => {
+        var doneMessage = await message.fetch(true);
+        const botInfoBtn = new ButtonBuilder()
+          .setLabel(`From ${doneMessage.author.username}!`)
+          .setStyle(ButtonStyle.Primary)
+          .setCustomId("details-botInfo")
+          .setDisabled(true);
+        const botAffiliationBtn = new ButtonBuilder()
+          .setLabel(`Check /affiliates for more Infos!`)
+          .setStyle(ButtonStyle.Secondary)
+          .setCustomId("details-affiliates")
+          .setDisabled(true);
+        var row: ActionRowBuilder<MessageActionRowComponentBuilder> =
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            botInfoBtn,
+            botAffiliationBtn
+          );
+        await this.syncUtils.sendToAllChannels(foundChannel.category, {
+          embeds: doneMessage.embeds,
+          components: [row],
+        });
+      }, 5000);
+    }
   }
 
   @ButtonComponent({ id: /details-(\d+)-(\d+)(-(\d+)-(\d+))?/ })
@@ -226,10 +279,11 @@ export class chatSync {
       interaction.showModal(modal);
     }
   }
+
   @ModalComponent({ id: "details-dummy" })
   async dummy(interaction: ButtonInteraction) {
-    await interaction.deferReply({ephemeral: true});
-    await interaction.editReply("Ok")
+    await interaction.deferReply({ ephemeral: true });
+    await interaction.editReply("Ok");
   }
   @ButtonComponent({ id: "details-links" })
   async showLinks(interaction: ButtonInteraction) {
