@@ -15,7 +15,7 @@ import { Container, Service } from "typedi";
 import discordsApi from "./utils/botsfordiscordapi";
 import express from "express";
 import { apirouter } from "./express/api/api";
-import InfinityAutoPoster from "ibl-autopost";
+import { InfinityAutoPoster } from "ibl-autopost";
 
 export var memberCounts = 0;
 var discords = new discordsApi();
