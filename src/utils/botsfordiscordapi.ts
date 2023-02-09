@@ -4,23 +4,24 @@ import bot, { memberCounts } from "../main";
 import { InfinityAutoPoster } from "ibl-autopost";
 import { BaseClient } from "ibl-autopost/dist/clients/BaseClient";
 var poster: BaseClient | undefined;
+if (!poster && !process.env.DEV) {
+  poster = InfinityAutoPoster(process.env.INFINITY_BOT_API_TOKEN!, bot); // your discord.js or eris client
+
+  // Optional Logger
+  poster.on("error", (err) => {
+    console.log(err);
+  });
+  // Optional Logger
+  poster.on("posted", (stats) => {
+    console.log(
+      `Posted stats to the Infinity Bot List API | ${stats.servers} servers`
+    );
+  });
+}
 class discordsApi {
   async syncUp() {
     if (!Config.Discords_Api_Token) return;
-    if (!poster && !process.env.DEV) {
-      poster = InfinityAutoPoster(process.env.INFINITY_BOT_API_TOKEN!, bot); // your discord.js or eris client
 
-      // Optional Logger
-      poster.on("error", (err) => {
-        console.log(err);
-      });
-      // Optional Logger
-      poster.on("posted", (stats) => {
-        console.log(
-          `Posted stats to the Infinity Bot List API | ${stats.servers} servers`
-        );
-      });
-    }
     axios
       .post(
         "https://discords.com/bots/api/bot/" + bot.user?.id,
