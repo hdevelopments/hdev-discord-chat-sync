@@ -169,6 +169,7 @@ export class chatSync {
             botAffiliationBtn
           );
         await this.syncUtils.sendToAllChannels(foundChannel.category, {
+          channelId: message.channelId,
           embeds: doneMessage.embeds,
           components: [row],
         });
