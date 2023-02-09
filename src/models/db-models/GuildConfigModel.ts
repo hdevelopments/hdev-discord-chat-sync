@@ -1,5 +1,8 @@
 import { Document, Field, ObjectId } from "ts-mongodb-orm";
 import BaseModel from "./BaseModel";
+import BadgesModel from "./BadgeModel";
+
+
 
 @Document({ collectionName: "guildConfig" })
 export default class guildConfig extends BaseModel {
@@ -14,6 +17,9 @@ export default class guildConfig extends BaseModel {
 
   @Field()
   vip: boolean = false;
+
+  @Field()
+  profile: {bagdes: BadgesModel[], options: {[key:string]: any}} = {bagdes: [], options: {}}
 
   @Field({ isRequired: false })
   channels: {

@@ -2,7 +2,6 @@ import express from "express";
 import bot from "../../main";
 import { typeDiDependencyRegistryEngine } from "discordx";
 import GuildConfigService from "../../services/GuildConfigService";
-import { channel } from "diagnostics_channel";
 const router = express.Router();
 
 var guildConf: GuildConfigService;

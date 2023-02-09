@@ -2,6 +2,8 @@ import {
   BaseGuildTextChannel,
   GuildChannelResolvable,
   GuildResolvable,
+  MessageCreateOptions,
+  MessagePayload,
 } from "discord.js";
 import bot from "../main";
 
@@ -11,13 +13,11 @@ const logChannels: { [key: string]: string } = {
 };
 
 class Logs {
-  public static async SendLog(msg: string) {
-      var channel = await bot.channels.fetch(
-        logChannels[process.env.DEV ? "dev" : "prod"]
-      ) as BaseGuildTextChannel;
-      if (channel)
-        channel.send({ content: msg, allowedMentions: { parse: ["users"] } });
-    
+  public static async SendLog(msg: MessageCreateOptions) {
+    var channel = (await bot.channels.fetch(
+      logChannels[process.env.DEV ? "dev" : "prod"]
+    )) as BaseGuildTextChannel;
+    if (channel) return await channel.send(msg);
   }
 }
 

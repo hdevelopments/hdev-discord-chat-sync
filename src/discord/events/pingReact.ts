@@ -141,7 +141,7 @@ export class pingReact {
       } catch (exc) {
         console.log(exc);
         Logs.SendLog(
-          `The Owner ${owner.user.username}@${owner.user.discriminator} | ${owner.user.id} couldnt be notified!`
+          {content: `The Owner ${owner.user.username}@${owner.user.discriminator} | ${owner.user.id} couldnt be notified!`}
         );
       }
     }, 5000);

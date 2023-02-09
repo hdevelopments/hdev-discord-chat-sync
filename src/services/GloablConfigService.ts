@@ -42,6 +42,11 @@ class GlobalConfigService {
       ) !== undefined
     );
   }
+
+  async isBlacklistedUser(user: string) {
+    var config = await this.getOrCreate();
+    return config.blacklisted[user];
+  }
 }
 
 export default GlobalConfigService;
