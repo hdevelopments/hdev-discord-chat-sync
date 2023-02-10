@@ -253,6 +253,7 @@ export class chatSync {
       modal.addComponents(row0, row1, row2, row3);
       interaction.showModal(modal);
     } catch (exc: any) {
+      console.log(exc)
       // Create text input fields
       const errorComponent = new TextInputBuilder()
         .setCustomId("error")
@@ -274,7 +275,8 @@ export class chatSync {
         )
         .setRequired(false);
       const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
-        errorComponent
+        errorComponent,
+        dataComponent
       );
       modal.addComponents(row1);
       interaction.showModal(modal);
