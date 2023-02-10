@@ -1,21 +1,13 @@
 import {
-  ActionRowBuilder,
   ApplicationCommandOptionType,
-  AutocompleteInteraction,
-  ChannelType,
   Colors,
   CommandInteraction,
   EmbedBuilder,
-  GuildTextBasedChannel,
-  MessageActionRowComponentBuilder,
   Snowflake,
-  StringSelectMenuBuilder,
-  StringSelectMenuInteraction,
 } from "discord.js";
 import {
   Discord,
   Guard,
-  SelectMenuComponent,
   Slash,
   SlashChoice,
   SlashGroup,
@@ -24,7 +16,6 @@ import {
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
-import syncUtils from "../../utils/syncModerationUtils";
 import bot from "../../main";
 
 export const options: {
