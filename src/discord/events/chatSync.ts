@@ -268,9 +268,9 @@ export class chatSync {
         .setLabel("Found Data")
         .setStyle(TextInputStyle.Paragraph)
         .setValue(
-          `ChannelID: ${channelId}\n
-          MessageID: ${messageId}\n
-          UserID: ${userId}\n
+          `ChannelID: ${channelId}
+          MessageID: ${messageId}
+          UserID: ${userId}
           ServerID: ${guildId}`
         )
         .setRequired(false);
