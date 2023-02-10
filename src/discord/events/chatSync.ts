@@ -276,9 +276,11 @@ export class chatSync {
         .setRequired(false);
       const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
         errorComponent,
-        dataComponent
       );
-      modal.addComponents(row1);
+      const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        dataComponent,
+      );
+      modal.addComponents(row1, row2);
       interaction.showModal(modal);
     }
   }
