@@ -5,6 +5,10 @@
 BytesToBits is a community for developers, providing people with like-minded people to chat and have fun with!
 <br>
 
+## **[Game Dev Space](https://discord.gg/c6VrE3pmn3) (Check them out!)**
+A Community for Game Developers and Unity who are Passionate in Games
+<br>
+
 # Support Discord
 
 <https://discord.gg/2vCVBnhSky>
