@@ -268,10 +268,7 @@ export class chatSync {
         .setLabel("Found Data")
         .setStyle(TextInputStyle.Paragraph)
         .setValue(
-          `ChannelID: ${channelId}
-          MessageID: ${messageId}
-          UserID: ${userId}
-          ServerID: ${guildId}`
+          `ChannelID: ${channelId}\nMessageID: ${messageId}\nUserID: ${userId}\nServerID: ${guildId}`
         )
         .setRequired(false);
       const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
