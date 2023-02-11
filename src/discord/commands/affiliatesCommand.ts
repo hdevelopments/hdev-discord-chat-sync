@@ -50,6 +50,29 @@ const affiliates = [
     image:
       "https://cdn.discordapp.com/attachments/816811551079923763/982460251506880552/BytesToBitsBanner.png",
   },
+  {
+    name: "Game Dev Space",
+    description: `**Welcome to Game Dev Space  A Community for Game Developers and Unity who are Passionate in Games**
+    ╔═══════════════════════════
+    ║ **The perfect place for game dev from the skill level of a beginner to advanced level**
+    ╠ :school: Learn - from experienced game developers
+    ╠ :handshake: Help - solving problems for each other
+    ╠ :man_teacher: Teach - to aspiring newbies looking to learn more!
+    ╠ :scroll: Friendly - We are friendly community with good environment and staff
+    ╠ :people_hugging:Experts - Great experts to help you with your game dev journey!
+    ╠ :performing_arts:Roles - Self roles with special roles
+    ╠ :love_letter:Channels - Different channels to talk in 
+    ╠ :heart_decoration:Meetings - Meeting with staff and Developer
+    ╠ :handshake:Partnerships - Open Partnerships/No Requirements
+    ╠ :love_letter:Suggestions - We listen to your Suggestions & Feedback
+    ╠ :teacher: Assets - Free Assets to build your game and skills
+    ═══════════════════════════
+    ║**Come and Join us**
+    ║Server Invite: https://discord.gg/c6VrE3pmn3`,
+    invite: "https://discord.gg/c6VrE3pmn3",
+    image:
+      "https://media.discordapp.net/attachments/1071103861483384904/1071111697336631378/GDS.png?width=1248&height=703",
+  },
 ];
 
 @Discord()

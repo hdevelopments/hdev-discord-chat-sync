@@ -87,14 +87,20 @@ class infoCommand {
         "https://discord.com/api/oauth2/authorize?client_id=1046756800260735058&permissions=533113203777&scope=bot%20applications.commands"
       );
 
-    const affiliateBtn = new ButtonBuilder()
+    const affiliateBtn_01 = new ButtonBuilder()
       .setLabel("Check out BytesToBits!")
       .setStyle(ButtonStyle.Link)
       .setURL("https://discord.gg/bytestobits");
+
+      const affiliateBtn_02 = new ButtonBuilder()
+      .setLabel("Check out Game Dev Space!")
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://discord.gg/c6VrE3pmn3");
     var row =
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         shareBtn,
-        affiliateBtn
+        affiliateBtn_01,
+        affiliateBtn_02
       );
     await interaction.editReply({
       embeds: [embed, embedTwo],
