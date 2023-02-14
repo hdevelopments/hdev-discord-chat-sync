@@ -1,6 +1,6 @@
 # Affiliates
 
-## **[BytesToBit](https://discord.gg/bytestobits) (Check them out!)**
+## **[BytesToBit](https://bytestobits.dev/discord) (Check them out!)**
 
 BytesToBits is a community for developers, providing people with like-minded people to chat and have fun with!
 <br>
