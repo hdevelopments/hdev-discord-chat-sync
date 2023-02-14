@@ -2,8 +2,6 @@ import { Document, Field, ObjectId } from "ts-mongodb-orm";
 import BaseModel from "./BaseModel";
 import BadgesModel from "./BadgeModel";
 
-
-
 @Document({ collectionName: "guildConfig" })
 export default class guildConfig extends BaseModel {
   @Field({ isRequired: true })
