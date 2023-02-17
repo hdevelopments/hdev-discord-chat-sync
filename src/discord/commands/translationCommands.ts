@@ -209,7 +209,7 @@ export class translateCommands {
     var results = Object.keys(languages)
       .filter(
         (x) =>
-          !["isSupported", "getCode"].includes(x) && (!text || x.includes(text))
+          !["isSupported", "getCode"].includes(x) && (!text || x.toLowerCase().includes(text.toLowerCase()))
       )
       .map((x) => ({ name: languages[x], value: x }));
 
