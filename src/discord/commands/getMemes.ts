@@ -31,10 +31,9 @@ import GuildConfigService from "../../services/GuildConfigService";
 @SlashGroup({
   description: "Gets you a meme :)",
   name: "memes",
-  dmPermission: true,
+  dmPermission: false,
 })
 @SlashGroup("memes")
-@Guard(noDms)
 class getMemes {
   @Inject()
   private guildConfigService: GuildConfigService;

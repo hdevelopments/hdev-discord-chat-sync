@@ -13,6 +13,18 @@ import {
   StringSelectMenuInteraction,
   EmbedBuilder,
   StringSelectMenuOptionBuilder,
+  NewsChannel,
+  PrivateThreadChannel,
+  PublicThreadChannel,
+  TextChannel,
+  VoiceChannel,
+  PermissionsBitField,
+  PermissionResolvable,
+  Interaction,
+  TextBasedChannel,
+  Embed,
+  GuildMember,
+  GuildTextBasedChannel,
 } from "discord.js";
 import {
   Discord,
@@ -26,22 +38,50 @@ import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import GlobalConfigService from "../../services/GloablConfigService";
-import guildConfig from "../../models/db-models/GuildConfigModel";
 import guildCategory from "../../models/db-models/GuildCategoryModel";
 
-const emojiData: {[key: string]: {[key:string]: any}} = {
-  ["attachments"]:{"true": "📁 🌐", "false": "🌐", "default": "🌐"}
+const emojiCategoryData: { [key: string]: { [key: string]: any } } = {
+  ["attachments"]: { true: "📁-🌐", false: "🌐", default: "🌐" },
+};
+
+function getEmojiForCategory(data: guildCategory) {
+  var emojis = "";
+  Object.entries(emojiCategoryData).forEach(([name, value], i) => {
+    var emoji = data.configs[name];
+    emojis += value[emoji] || value["default"];
+  });
+  return emojis;
 }
 
-function getEmojiForCategory(data: guildCategory){
-  var emojis = ""
-  Object.entries(data.configs).forEach(([name, value], i) => {
-    var emoji = emojiData[name]
-    if(emoji){
-      emojis += emoji[value] || emoji["default"]
-    }
-  })
-  return emojis
+const emojiChannelData: {
+  permission: PermissionResolvable;
+  up: string;
+  down: string;
+}[] = [
+  {
+    permission: PermissionsBitField.Flags.AttachFiles,
+    down: "🌐",
+    up: "📁-🌐",
+  },
+];
+
+function getEmojiForChannel(
+  channel:
+    | NewsChannel
+    | TextChannel
+    | PrivateThreadChannel
+    | PublicThreadChannel<boolean>
+    | VoiceChannel
+) {
+  var emojis = "- ";
+  emojiChannelData.forEach((x) => {
+    emojis += channel
+      .permissionsFor(channel.guild.members.me!, true)
+      .has(x.permission)
+      ? x.up
+      : x.down;
+  });
+  return emojis;
 }
 
 const step01: SelectMenuComponentOptionData[] = [
@@ -73,7 +113,13 @@ const step02: {
         categories
           .filter((x) => !x.password)
           .map((x) => {
-            return { label: x.name, value: x._id.toString(), description: `${x.description} | ${getEmojiForCategory(x)}` };
+            return {
+              label: x.name,
+              value: x._id.toString(),
+              description: `${
+                x.description ? x.description : "No Description"
+              } | ${getEmojiForCategory(x)}`,
+            };
           })
       )
       .setCustomId("setup-menu-step-public-1");
@@ -96,7 +142,13 @@ const step02: {
   },
 };
 @Discord()
-@SlashGroup("chat")
+@SlashGroup({
+  description: "Lets you set up interactively a Cross Server Chat!",
+  name: "setup",
+  defaultMemberPermissions: ["ManageChannels", "ManageGuild"],
+  dmPermission: false,
+})
+@SlashGroup("setup")
 @Guard(noDms)
 class setupCommands {
   @Inject()
@@ -108,10 +160,49 @@ class setupCommands {
     [key: string]: { categoryId?: string; selectedChannel?: string };
   } = {};
 
+  async createResponseForChannel(
+    interaction: Interaction,
+    channel: GuildTextBasedChannel
+  ): Promise<EmbedBuilder> {
+    var cfg = await this.guildConfigService.getByChannel(
+      interaction.guildId!,
+      interaction.channelId!
+    );
+    if (cfg)
+      var category = await this.guildConfigService.getCategory(cfg?.category);
+    var embed = new EmbedBuilder();
+
+    embed.setTimestamp();
+
+    embed.setAuthor({
+      name: interaction.user.username,
+      iconURL: (interaction.member as GuildMember).avatarURL() || undefined,
+    });
+    var syncedStatus = cfg ? "✅" : "❌";
+    if (cfg && category) {
+      syncedStatus += `\nChat Room: ${
+        category.name +
+        " " +
+        (category.password ? "🔒" : "🔓") +
+        " | " +
+        getEmojiForChannel(interaction.channel as any) +
+        "( Possible: " +
+        getEmojiForCategory(category) +
+        ")"
+      }`;
+      syncedStatus += `\nConfig:}`;
+    }
+    embed.addFields({
+      name: "Data:",
+      value: `Name: ${channel.name}\nSynced: ${syncedStatus}`,
+    });
+    return embed;
+  }
+
   @Slash({
-    description: "Lets you set up a synced Channel.",
+    description: "Start the setup sequence!",
   })
-  async setup(interaction: CommandInteraction) {
+  async start(interaction: CommandInteraction) {
     // create menu for roles
     const menu = new StringSelectMenuBuilder()
       .addOptions(step01)
@@ -205,7 +296,11 @@ class setupCommands {
         );
       })
       .map((x) => {
-        return { label: x?.name!, value: x?.id! };
+        return {
+          label: x?.name!,
+          value: x?.id!,
+          description: getEmojiForChannel(x as any),
+        };
       });
     if (options.length > 24) {
       options.length = 25;
@@ -280,13 +375,22 @@ class setupCommands {
       return;
     }
     await interaction.deferUpdate();
-
-    var embed = new EmbedBuilder();
+    var channel = await interaction.guild?.channels.fetch(
+      this.setupData[interaction.user.id + "-" + interaction.guildId]
+        .selectedChannel!
+    );
+    if (!channel || !channel.isTextBased()) {
+      interaction.message.edit("Something went wrong! Please retry! (Sorry!)");
+      return;
+    }
+    var embed = await this.createResponseForChannel(interaction, channel);
     // const publicTopics = new StringSelectMenuBuilder()
     //   .addOptions({})
     //   .setCustomId("setup-menu-step-public-2");
     interaction.message.edit({
-      content: "In Progress!",
+      content: null,
+      embeds: [embed],
+      components: [],
     });
   }
 }
