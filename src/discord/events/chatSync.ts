@@ -14,6 +14,8 @@ import {
   MessageActionRowComponentBuilder,
   ButtonStyle,
   ButtonBuilder,
+  GuildTextBasedChannel,
+  ChannelType,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
@@ -92,8 +94,7 @@ export class chatSync {
     if (phishingresult === true) {
       var logchannel = (await bot.channels.fetch(
         "1051147189243621477"
-      )) as TextBasedChannel;
-
+      )) as GuildTextBasedChannel;
       logchannel.send(
         `Phishing User detected!\nUser: ${message.author.toString()}\nMessage: ||<${
           message.content
@@ -253,7 +254,7 @@ export class chatSync {
       modal.addComponents(row0, row1, row2, row3);
       interaction.showModal(modal);
     } catch (exc: any) {
-      console.log(exc)
+      console.log(exc);
       // Create text input fields
       const errorComponent = new TextInputBuilder()
         .setCustomId("error")
@@ -272,10 +273,10 @@ export class chatSync {
         )
         .setRequired(false);
       const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
-        errorComponent,
+        errorComponent
       );
       const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
-        dataComponent,
+        dataComponent
       );
       modal.addComponents(row1, row2);
       interaction.showModal(modal);

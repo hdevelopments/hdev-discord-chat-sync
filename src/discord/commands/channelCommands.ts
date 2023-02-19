@@ -221,7 +221,7 @@ class channelCommands {
       
       Reporter: ${interaction.user.username}@${interaction.user.discriminator} ${interaction.user.id}`,
     });
-    if (messageId && interaction.channel?.type !== ChannelType.GuildStageVoice) {
+    if (messageId) {
       interaction.channel?.messages
         .fetch(messageId)
         .then((x) => {

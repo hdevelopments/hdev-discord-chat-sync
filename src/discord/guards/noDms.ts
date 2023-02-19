@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+import { ChannelType, Interaction } from "discord.js";
 import { Client, Next } from "discordx";
 export const noDms = async (
   interaction: Interaction,
@@ -7,7 +7,7 @@ export const noDms = async (
 ) => {
   if ((!interaction || interaction.inGuild()) && interaction.guildId) {
     await next();
-  }else{
-    interaction.channel?.send("You have to be in a guild to execute this!")
+  } else {
+      interaction.channel?.send("You have to be in a guild to execute this!");
   }
 };
