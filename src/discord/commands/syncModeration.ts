@@ -24,18 +24,29 @@ import { noDms } from "../guards/noDms";
 import syncUtils from "../../utils/syncModerationUtils";
 
 export const options: {
-  [key: string]: { globalOnly?: boolean; options: any[], helpText?: string };
+  [key: string]: {
+    globalOnly?: boolean;
+    options: any[];
+    helpText?: string;
+    default: any;
+  };
 } = {
-  ["noInvites"]: { options: ["true", "false"] },
-  ["noEmbeddedLinks"]: { options: ["true", "false"] },
+  ["noInvites"]: { options: ["true", "false"], default: "false" },
+  ["noEmbeddedLinks"]: { options: ["true", "false"], default: "false" },
   ["type"]: {
     options: [
       "Embed ( Big, Default )",
       "Webhook ( Small, it does need the Webhook permission! )",
     ],
+    default: "Embed ( Big, Default )",
   },
-  ["noButtons"]: { options: ["true", "false"] },
-  ["memesChannel"]: { globalOnly: true, options: ["*"], helpText: "The Channel Id" },
+  ["noButtons"]: { options: ["true", "false"], default: "false" },
+  ["memesChannel"]: {
+    globalOnly: true,
+    options: ["*"],
+    helpText: "The Channel Id",
+    default: "*",
+  },
 };
 
 @Discord()
@@ -186,7 +197,10 @@ class syncModeration {
     newValue: any,
     interaction: CommandInteraction
   ) {
-    if (!options[option].options.includes(newValue) && !options[option].options.includes("*")) {
+    if (
+      !options[option].options.includes(newValue) &&
+      !options[option].options.includes("*")
+    ) {
       await interaction.reply({
         ephemeral: true,
         content: "You need to select one of the given options!",
@@ -212,7 +226,10 @@ class syncModeration {
     if (options[option].options.includes("*")) {
       interaction.respond(
         options[option].options.map((x) => {
-          return { name: `Free Text (${options[option!].helpText})`, value: "*" };
+          return {
+            name: `Free Text (${options[option!].helpText})`,
+            value: "*",
+          };
         })
       );
       return;

@@ -21,8 +21,6 @@ import {
   PermissionsBitField,
   PermissionResolvable,
   Interaction,
-  TextBasedChannel,
-  Embed,
   GuildMember,
   GuildTextBasedChannel,
 } from "discord.js";
@@ -39,6 +37,8 @@ import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import GlobalConfigService from "../../services/GloablConfigService";
 import guildCategory from "../../models/db-models/GuildCategoryModel";
+import { options } from "./syncModeration";
+import { ObjectId } from "ts-mongodb-orm";
 
 const emojiCategoryData: { [key: string]: { [key: string]: any } } = {
   ["attachments"]: { true: "📁-🌐", false: "🌐", default: "🌐" },
@@ -164,12 +164,19 @@ class setupCommands {
     interaction: Interaction,
     channel: GuildTextBasedChannel
   ): Promise<EmbedBuilder> {
+    console.log(channel);
+    var guildCfg = await this.guildConfigService.getOrCreate(
+      interaction.guildId!
+    );
     var cfg = await this.guildConfigService.getByChannel(
       interaction.guildId!,
-      interaction.channelId!
+      channel.id
     );
-    if (cfg)
-      var category = await this.guildConfigService.getCategory(cfg?.category);
+    var category: guildCategory | undefined;
+    if (cfg !== undefined)
+      category = await this.guildConfigService.findCategory(
+        new ObjectId(cfg.category)
+      );
     var embed = new EmbedBuilder();
 
     embed.setTimestamp();
@@ -179,23 +186,52 @@ class setupCommands {
       iconURL: (interaction.member as GuildMember).avatarURL() || undefined,
     });
     var syncedStatus = cfg ? "✅" : "❌";
+    var config: string | undefined;
     if (cfg && category) {
       syncedStatus += `\nChat Room: ${
         category.name +
         " " +
         (category.password ? "🔒" : "🔓") +
         " | " +
+        getEmojiForCategory(interaction.channel as any) +
+        "\n( Available in the Channel: " +
         getEmojiForChannel(interaction.channel as any) +
-        "( Possible: " +
-        getEmojiForCategory(category) +
-        ")"
+        " )"
       }`;
-      syncedStatus += `\nConfig:}`;
+      config = `Config:${Object.entries(options)
+        .filter((x) => !x[1].globalOnly)
+        .map((x) => {
+          console.log(x);
+          console.log(cfg);
+          return `\n> ${x[0]}: ${
+            cfg?.configs && cfg?.configs[x[0]] !== undefined
+              ? cfg?.configs[x[0]]
+              : guildCfg?.configs[x[0]] !== undefined
+              ? guildCfg?.configs[x[0]]
+              : x[1].default
+          }`;
+        })}`;
+    } else {
+      syncedStatus += `\n Available Options: ${getEmojiForChannel(
+        interaction.channel as any
+      )}`;
     }
     embed.addFields({
-      name: "Data:",
-      value: `Name: ${channel.name}\nSynced: ${syncedStatus}`,
+      name: "Name:",
+      value: `${channel.name}`,
     });
+
+    embed.addFields({
+      name: "Synced-Status:",
+      value: `${syncedStatus}`,
+    });
+
+    if (config)
+      embed.addFields({
+        name: "Config:",
+        value: `${config}`,
+      });
+
     return embed;
   }
 

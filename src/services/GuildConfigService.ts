@@ -50,12 +50,6 @@ class GuildConfigService {
     );
   }
 
-  async getByCategoryId(categoryId: string) {
-    return await this.GuildCategoryRepo.filterOne("_id", (x) =>
-      x.eq(categoryId)
-    );
-  }
-
   async getAllByCategoryId(categoryId: string) {
     return (await this.getAllChannels()).filter(x => {
       return Object.values(x.channels).find(x =>  x.category === categoryId ) !== undefined

@@ -21,6 +21,7 @@ import syncUtils from "../../utils/syncModerationUtils";
 import { Phishing } from "./anti-phishing";
 import GlobalConfigService from "../../services/GloablConfigService";
 import Filter from "bad-words";
+import { ObjectId } from "ts-mongodb-orm";
 var profanityfilter = new Filter();
 
 profanityfilter.addWords(
@@ -58,8 +59,8 @@ export class chatSync {
     var config = await this.guildConfig.getOrCreate(message.guildId!);
     var foundChannel = config.channels[message.channelId];
     if (!foundChannel) return;
-    var category = await this.guildConfig.getByCategoryId(
-      foundChannel.category
+    var category = await this.guildConfig.findCategory(
+      new ObjectId(foundChannel.category)
     );
     if (
       typeof foundChannel.lastMessages === "number" ||
