@@ -4,6 +4,7 @@ import {
   ApplicationCommandType,
   AttachmentBuilder,
   AutocompleteInteraction,
+  ChannelType,
   CommandInteraction,
   EmbedBuilder,
   ForumChannel,
@@ -220,7 +221,7 @@ class channelCommands {
       
       Reporter: ${interaction.user.username}@${interaction.user.discriminator} ${interaction.user.id}`,
     });
-    if (messageId) {
+    if (messageId && interaction.channel?.type !== ChannelType.GuildStageVoice) {
       interaction.channel?.messages
         .fetch(messageId)
         .then((x) => {
