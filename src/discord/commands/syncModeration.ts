@@ -22,9 +22,10 @@ import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
 import { noDms } from "../guards/noDms";
 import syncUtils from "../../utils/syncModerationUtils";
+import { addAbortSignal } from "stream";
 
 export const options: {
-  [key: string]: { globalOnly?: boolean; options: any[], helpText?: string };
+  [key: string]: { globalOnly?: boolean; options: any[]; helpText?: string };
 } = {
   ["noInvites"]: { options: ["true", "false"] },
   ["noEmbeddedLinks"]: { options: ["true", "false"] },
@@ -35,7 +36,11 @@ export const options: {
     ],
   },
   ["noButtons"]: { options: ["true", "false"] },
-  ["memesChannel"]: { globalOnly: true, options: ["*"], helpText: "The Channel Id" },
+  ["memesChannel"]: {
+    globalOnly: true,
+    options: ["*"],
+    helpText: "The Channel Id",
+  },
 };
 
 @Discord()
@@ -115,14 +120,14 @@ class syncModeration {
 
     // extract selected value by member
     const category = interaction.values?.[0];
-
+    var cfg = this.setupData[interaction.message.id];
     // if value not found
-    if (!category) {
-      return interaction.editReply("invalid Selection!, select again");
+    if (!category || !cfg) {
+      return interaction.editReply("Invalid Selection or Timeout!, Try again");
     }
 
     var data = await this.guildConfigService.getOrCreate(interaction.guildId!);
-    var setupData = this.setupData[interaction.message.id].channel;
+    var setupData = cfg.channel;
     if (!data.channels) data.channels = {};
     data.channels[setupData] = {
       category: category,
@@ -132,7 +137,7 @@ class syncModeration {
       lastMessages: {},
     };
     await this.guildConfigService.save(data);
-
+    await interaction.message.delete();
     await this.syncUtils.sendToAllChannels(category, {
       content: "**" + interaction.guild?.name + "** joined the chat!",
     });
@@ -186,7 +191,10 @@ class syncModeration {
     newValue: any,
     interaction: CommandInteraction
   ) {
-    if (!options[option].options.includes(newValue) && !options[option].options.includes("*")) {
+    if (
+      !options[option].options.includes(newValue) &&
+      !options[option].options.includes("*")
+    ) {
       await interaction.reply({
         ephemeral: true,
         content: "You need to select one of the given options!",
@@ -212,7 +220,10 @@ class syncModeration {
     if (options[option].options.includes("*")) {
       interaction.respond(
         options[option].options.map((x) => {
-          return { name: `Free Text (${options[option!].helpText})`, value: "*" };
+          return {
+            name: `Free Text (${options[option!].helpText})`,
+            value: "*",
+          };
         })
       );
       return;
