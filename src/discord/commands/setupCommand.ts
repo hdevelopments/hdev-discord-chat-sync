@@ -137,7 +137,10 @@ const step02: {
         publicTopics
       );
     return {
-      content: "Select the Chat Room you want to join:",
+      content: `Select the Chat Room you want to join:
+Legend: 
+> 🌐 - Chatting Enabled
+> 📁 - Attachments Enabled`,
       components: [row],
     };
   },
@@ -453,7 +456,10 @@ class setupCommands {
         publicTopics
       );
     interaction.message.edit({
-      content: "What Channel you want to sync up:",
+      content: `What Channel you want to sync up:
+Legend:
+> 🌐 - Chatting Available
+> 📁 - Attachments Available`,
       components: [row],
     });
   }
@@ -518,7 +524,7 @@ class setupCommands {
       guild: interaction.guildId!,
     };
     interaction.message.edit({
-      content: `Is ${channel?.toString()} correct?`,
+      content: `Is ${channel?.toString()} (${getEmojiForChannel(channel as GuildTextBasedChannel)}) correct?`,
       components: [row],
     });
   }
@@ -535,8 +541,6 @@ class setupCommands {
       interaction.reply({ content: "This isnt yours!", ephemeral: true });
       return;
     }
-    this.setupData[interaction.user.id + "-" + interaction.guildId].type =
-      "private";
     await interaction.deferUpdate();
     const value = interaction.values?.[0];
     if (value === "create-private-topic") {
@@ -563,20 +567,23 @@ class setupCommands {
       interaction.message.edit("Something went wrong! Please retry! (Sorry!)");
       return;
     }
-    var category : guildCategory | undefined
+    var category: guildCategory | undefined;
 
-    if(!this.setupData[interaction.user.id + "-" + interaction.guildId].create){
+    if (
+      !this.setupData[interaction.user.id + "-" + interaction.guildId].create
+    ) {
       category = await this.guildConfigService.findCategory(
         this.setupData[interaction.user.id + "-" + interaction.guildId].category
           ._id!
       );
-    }else{
+    } else {
       category = await this.guildConfigService.getOrCreateCategory(
-        this.setupData[interaction.user.id + "-" + interaction.guildId].category
-          ._id?.toString()!, interaction.user
+        this.setupData[
+          interaction.user.id + "-" + interaction.guildId
+        ].category._id?.toString()!,
+        interaction.user
       );
     }
-  
 
     var { override, embed } = await this.createResponseForChannel(
       interaction,
@@ -608,10 +615,10 @@ class setupCommands {
     }
 
     if (
-      !this.setupData[interaction.user.id + "-" + interaction.guildId]
-        .selectedChannel ||
-      !this.setupData[interaction.user.id + "-" + interaction.guildId]
-        .categoryId
+      !this.setupData[interaction.user.id + "-" + interaction.guildId].channel
+        .channel ||
+      !this.setupData[interaction.user.id + "-" + interaction.guildId].category
+        ._id
     ) {
       interaction.reply({
         content: "Please restart the process! Something went wrong",
@@ -625,14 +632,15 @@ class setupCommands {
     data.channels[
       this.setupData[
         interaction.user.id + "-" + interaction.guildId
-      ].selectedChannel!
+      ].channel.channel!
     ] = {
       category:
-        this.setupData[interaction.user.id + "-" + interaction.guildId]
-          .categoryId!,
+        this.setupData[
+          interaction.user.id + "-" + interaction.guildId
+        ].category._id?.toString()!,
       channel:
-        this.setupData[interaction.user.id + "-" + interaction.guildId]
-          .selectedChannel!,
+        this.setupData[interaction.user.id + "-" + interaction.guildId].channel
+          .channel!,
       guild: interaction.guildId!,
       configs: {},
       lastMessages: {},
