@@ -3,7 +3,6 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonInteraction,
-  ButtonStyle,
   CommandInteraction,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -23,6 +22,12 @@ import {
   Interaction,
   GuildMember,
   GuildTextBasedChannel,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  AnySelectMenuInteraction,
+  ButtonStyle,
+  ModalSubmitInteraction,
 } from "discord.js";
 import {
   Discord,
@@ -31,6 +36,7 @@ import {
   Slash,
   SelectMenuComponent,
   ButtonComponent,
+  ModalComponent,
 } from "discordx";
 import { Inject } from "typedi";
 import GuildConfigService from "../../services/GuildConfigService";
@@ -39,6 +45,7 @@ import GlobalConfigService from "../../services/GloablConfigService";
 import guildCategory from "../../models/db-models/GuildCategoryModel";
 import { options } from "./syncModeration";
 import { ObjectId } from "ts-mongodb-orm";
+import ChannelModel from "../../models/ChannelModel";
 
 const emojiCategoryData: { [key: string]: { [key: string]: any } } = {
   ["attachments"]: { true: "📁-🌐", false: "🌐", default: "🌐" },
@@ -99,11 +106,13 @@ const step01: SelectMenuComponentOptionData[] = [
 
 const step02: {
   [key: string]: (
+    interaction: AnySelectMenuInteraction,
     guildConfigService: GuildConfigService,
     globalConfig: GlobalConfigService
-  ) => Promise<MessageEditOptions>;
+  ) => Promise<MessageEditOptions | void>;
 } = {
   public: async (
+    interaction: AnySelectMenuInteraction,
     guildConfigService: GuildConfigService,
     globalConfig: GlobalConfigService
   ) => {
@@ -133,14 +142,63 @@ const step02: {
     };
   },
   private: async (
+    interaction: AnySelectMenuInteraction,
     guildConfigService: GuildConfigService,
     globalConfig: GlobalConfigService
   ) => {
+    const privateTopics = new StringSelectMenuBuilder()
+      .addOptions(
+        { label: "Create a Private Topcic", value: "create-private-topic" },
+        { label: "Join a Private Topcic", value: "join-private-topic" }
+      )
+      .setCustomId("setup-menu-step-private-1");
+    var row =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        privateTopics
+      );
     return {
-      content: "Select the Chat Room you want to join:",
+      content: "Select what you want to do:",
+      components: [row],
     };
   },
 };
+
+const stepprivate01: {
+  [key: string]: (
+    interaction: AnySelectMenuInteraction,
+    guildConfigService: GuildConfigService,
+    globalConfig: GlobalConfigService
+  ) => Promise<MessageEditOptions | void>;
+} = {};
+//  // Create the modal
+//  const modal = new ModalBuilder()
+//  .setTitle("Report a Message")
+//  .setCustomId("join");
+
+// // Create text input fields
+// const privateTopicNameComponent = new TextInputBuilder()
+//  .setCustomId("private-topic-name")
+//  .setLabel("The name of the Topic:")
+//  .setStyle(TextInputStyle.Short)
+//  .setPlaceholder("The Name!")
+//  .setRequired(true);
+
+// const privateTopicPasswordComponent = new TextInputBuilder()
+//  .setCustomId("private-topic-password")
+//  .setLabel("The Password:")
+//  .setPlaceholder("The Password of the Topic")
+//  .setStyle(TextInputStyle.Short);
+
+// const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+//  privateTopicNameComponent
+// );
+
+// const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+//  privateTopicPasswordComponent
+// );
+
+// modal.addComponents(row1, row2);
+// interaction.showModal(modal);
 @Discord()
 @SlashGroup({
   description: "Lets you set up interactively a Cross Server Chat!",
@@ -157,14 +215,18 @@ class setupCommands {
   private globalConfig: GlobalConfigService;
 
   private setupData: {
-    [key: string]: { categoryId?: string; selectedChannel?: string };
+    [key: string]: {
+      channel: Partial<ChannelModel>;
+      category: Partial<guildCategory>;
+      create: boolean;
+    };
   } = {};
 
   async createResponseForChannel(
     interaction: Interaction,
-    channel: GuildTextBasedChannel
-  ): Promise<EmbedBuilder> {
-    console.log(channel);
+    channel: GuildTextBasedChannel,
+    targetCategory: guildCategory | undefined
+  ): Promise<{ override: boolean; embed: EmbedBuilder[] }> {
     var guildCfg = await this.guildConfigService.getOrCreate(
       interaction.guildId!
     );
@@ -187,7 +249,9 @@ class setupCommands {
     });
     var syncedStatus = cfg ? "✅" : "❌";
     var config: string | undefined;
+    var override: boolean = false;
     if (cfg && category) {
+      override = true;
       syncedStatus += `\nChat Room: ${
         category.name +
         " " +
@@ -232,7 +296,17 @@ class setupCommands {
         value: `${config}`,
       });
 
-    return embed;
+    if (targetCategory)
+      embed.addFields({
+        name: "Target Chat Room:",
+        value: `Name: ${targetCategory.name}\n${
+          targetCategory.description
+            ? "Description: " + targetCategory.description
+            : ""
+        }`,
+      });
+
+    return { override: override, embed: [embed] };
   }
 
   @Slash({
@@ -247,7 +321,11 @@ class setupCommands {
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         menu
       );
-    this.setupData[interaction.user.id + "-" + interaction.guildId] = {};
+    this.setupData[interaction.user.id + "-" + interaction.guildId] = {
+      category: {},
+      channel: {},
+      create: false,
+    };
     interaction.reply({ components: [row] });
   }
 
@@ -259,10 +337,15 @@ class setupCommands {
       return;
     }
     const value = interaction.values?.[0];
-
-    interaction.message.edit({
-      ...(await step02[value](this.guildConfigService, this.globalConfig)),
-    });
+    var result = await step02[value](
+      interaction,
+      this.guildConfigService,
+      this.globalConfig
+    );
+    if (result)
+      interaction.message.edit({
+        ...result,
+      });
   }
 
   @SelectMenuComponent({ id: "setup-menu-step-public-1" })
@@ -273,11 +356,21 @@ class setupCommands {
     }
     await interaction.deferUpdate();
     const value = interaction.values?.[0];
+    const category = await this.guildConfigService.findCategory(
+      new ObjectId(value)
+    );
+    if (!category) {
+      interaction.followUp({
+        ephemeral: true,
+        content: "Sorry something went wrong!",
+      });
+      return;
+    }
     const acceptButton = new ButtonBuilder()
       .setLabel(`I read and accept them!`)
       .setStyle(ButtonStyle.Danger)
       .setCustomId(
-        "setup-menu-step-public-accept--" +
+        "setup-menu-step-accept--" +
           interaction.user.id +
           "-" +
           interaction.guildId
@@ -302,16 +395,16 @@ class setupCommands {
         seePrivacyPolicy
       );
 
-    this.setupData[interaction.user.id + "-" + interaction.guildId] = {
-      categoryId: value,
-    };
+    this.setupData[interaction.user.id + "-" + interaction.guildId].category =
+      category;
+
     interaction.message.edit({
       content: "Do you accept the TOS and Privacy Policy of Hedges Chatter?",
       components: [row],
     });
   }
 
-  @ButtonComponent({ id: /setup-menu-step-public-accept--(\d+)/gim })
+  @ButtonComponent({ id: /setup-menu-step-accept--(\d+)/gim })
   async tosAcceptionButton(interaction: ButtonInteraction) {
     if (!this.setupData[interaction.user.id + "-" + interaction.guildId]) {
       interaction.reply({ content: "This isnt yours!", ephemeral: true });
@@ -371,8 +464,30 @@ class setupCommands {
       interaction.reply({ content: "This isnt yours!", ephemeral: true });
       return;
     }
-    await interaction.deferUpdate();
     const value = interaction.values?.[0];
+    if (value === "custom") {
+      const modal = new ModalBuilder()
+        .setTitle("Custom ChannelID")
+        .setCustomId("setup-menu-topic-custom");
+
+      // Create text input fields
+      const channelIdCommponent = new TextInputBuilder()
+        .setCustomId("channel-id")
+        .setLabel("The Channel ID:")
+        .setStyle(TextInputStyle.Short)
+        .setPlaceholder("The ChannelID")
+        .setRequired(true);
+
+      const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+        channelIdCommponent
+      );
+
+      modal.addComponents(row1);
+      interaction.showModal(modal);
+      return;
+    }
+    await interaction.deferUpdate();
+
     const channel = await interaction.guild?.channels?.fetch(value);
     const acceptButton = new ButtonBuilder()
       .setLabel(`Yes Perfect!`)
@@ -394,14 +509,43 @@ class setupCommands {
         declineButton
       );
 
-    this.setupData[interaction.user.id + "-" + interaction.guildId] = {
-      ...this.setupData[interaction.user.id + "-" + interaction.guildId],
-      selectedChannel: value,
+    this.setupData[interaction.user.id + "-" + interaction.guildId].channel = {
+      category:
+        this.setupData[
+          interaction.user.id + "-" + interaction.guildId
+        ].category._id?.toString(),
+      channel: channel?.id,
+      guild: interaction.guildId!,
     };
     interaction.message.edit({
       content: `Is ${channel?.toString()} correct?`,
       components: [row],
     });
+  }
+  @ModalComponent({ id: "setup-menu-topic-custom" })
+  async customId(interaction: ModalSubmitInteraction) {
+    const [channelId] = ["channel-id"].map((id) =>
+      interaction.fields.getTextInputValue(id)
+    );
+    const channel = await interaction.guild?.channels?.fetch(channelId);
+  }
+  @SelectMenuComponent({ id: "setup-menu-step-private-1" })
+  async setupPrivateTopic(interaction: StringSelectMenuInteraction) {
+    if (!this.setupData[interaction.user.id + "-" + interaction.guildId]) {
+      interaction.reply({ content: "This isnt yours!", ephemeral: true });
+      return;
+    }
+    this.setupData[interaction.user.id + "-" + interaction.guildId].type =
+      "private";
+    await interaction.deferUpdate();
+    const value = interaction.values?.[0];
+    if (value === "create-private-topic") {
+      this.setupData[interaction.user.id + "-" + interaction.guildId].create =
+        true;
+    } else {
+      this.setupData[interaction.user.id + "-" + interaction.guildId].create =
+        false;
+    }
   }
 
   @ButtonComponent({ id: "setup-menu-step-finish" })
@@ -412,21 +556,87 @@ class setupCommands {
     }
     await interaction.deferUpdate();
     var channel = await interaction.guild?.channels.fetch(
-      this.setupData[interaction.user.id + "-" + interaction.guildId]
-        .selectedChannel!
+      this.setupData[interaction.user.id + "-" + interaction.guildId].channel
+        .channel!
     );
     if (!channel || !channel.isTextBased()) {
       interaction.message.edit("Something went wrong! Please retry! (Sorry!)");
       return;
     }
-    var embed = await this.createResponseForChannel(interaction, channel);
-    // const publicTopics = new StringSelectMenuBuilder()
-    //   .addOptions({})
-    //   .setCustomId("setup-menu-step-public-2");
+    var category : guildCategory | undefined
+
+    if(!this.setupData[interaction.user.id + "-" + interaction.guildId].create){
+      category = await this.guildConfigService.findCategory(
+        this.setupData[interaction.user.id + "-" + interaction.guildId].category
+          ._id!
+      );
+    }else{
+      category = await this.guildConfigService.getOrCreateCategory(
+        this.setupData[interaction.user.id + "-" + interaction.guildId].category
+          ._id?.toString()!, interaction.user
+      );
+    }
+  
+
+    var { override, embed } = await this.createResponseForChannel(
+      interaction,
+      channel,
+      category
+    );
+
+    const continueButton = new ButtonBuilder()
+      .setLabel(override ? "Override" : "Save")
+      .setStyle(override ? ButtonStyle.Danger : ButtonStyle.Primary)
+      .setCustomId("setup-menu-step-apply");
+
+    var row =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        continueButton
+      );
+
     interaction.message.edit({
       content: null,
-      embeds: [embed],
-      components: [],
+      embeds: embed,
+      components: [row],
     });
+  }
+  @ButtonComponent({ id: "setup-menu-step-apply" })
+  async setupApply(interaction: ButtonInteraction) {
+    if (!this.setupData[interaction.user.id + "-" + interaction.guildId]) {
+      interaction.reply({ content: "This isnt yours!", ephemeral: true });
+      return;
+    }
+
+    if (
+      !this.setupData[interaction.user.id + "-" + interaction.guildId]
+        .selectedChannel ||
+      !this.setupData[interaction.user.id + "-" + interaction.guildId]
+        .categoryId
+    ) {
+      interaction.reply({
+        content: "Please restart the process! Something went wrong",
+        ephemeral: true,
+      });
+      return;
+    }
+    interaction.deferUpdate();
+    var data = await this.guildConfigService.getOrCreate(interaction.guildId!);
+    if (!data.channels) data.channels = {};
+    data.channels[
+      this.setupData[
+        interaction.user.id + "-" + interaction.guildId
+      ].selectedChannel!
+    ] = {
+      category:
+        this.setupData[interaction.user.id + "-" + interaction.guildId]
+          .categoryId!,
+      channel:
+        this.setupData[interaction.user.id + "-" + interaction.guildId]
+          .selectedChannel!,
+      guild: interaction.guildId!,
+      configs: {},
+      lastMessages: {},
+    };
+    await this.guildConfigService.save(data);
   }
 }
