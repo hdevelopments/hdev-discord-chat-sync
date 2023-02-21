@@ -1,6 +1,7 @@
 import { Document, Field, ObjectId } from "ts-mongodb-orm";
 import BaseModel from "./BaseModel";
 import BadgesModel from "./BadgeModel";
+import ChannelModel from "../ChannelModel";
 
 @Document({ collectionName: "guildConfig" })
 export default class guildConfig extends BaseModel {
@@ -21,12 +22,6 @@ export default class guildConfig extends BaseModel {
 
   @Field({ isRequired: false })
   channels: {
-    [key: string]: {
-      guild: string;
-      channel: string;
-      category: string;
-      configs: {[key: string]: any}
-      lastMessages: {[key: string]: number | undefined};
-    };
+    [key: string]: ChannelModel;
   } = {};
 }
