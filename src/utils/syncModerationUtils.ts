@@ -22,6 +22,9 @@ export async function asyncForEach<T>(
     await callback(array[index], index, array);
   }
 }
+
+const urlWhitelist = ["youtube.com", "tenor.com", "discordapp.net"];
+
 @Service()
 export default class syncUtils {
   @Inject()
@@ -141,6 +144,11 @@ export default class syncUtils {
           }
         }
         urls = Array.from(text.matchAll(/(http[s]?:\/\/([^ \n])*)/gim));
+
+        if(urls.some((x) => {
+          console.log(x[0])
+          return urlWhitelist.find(whitelistUrl => x[0].includes(whitelistUrl)) === undefined
+        }) && foundCategory?.password === undefined) return
       }
 
       if (isInBotCache) {

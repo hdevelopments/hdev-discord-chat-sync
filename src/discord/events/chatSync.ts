@@ -6,7 +6,6 @@ import {
   ButtonInteraction,
   MessageType,
   ModalBuilder,
-  TextBasedChannel,
   TextInputBuilder,
   TextInputStyle,
   Events,
@@ -15,7 +14,6 @@ import {
   ButtonStyle,
   ButtonBuilder,
   GuildTextBasedChannel,
-  ChannelType,
 } from "discord.js";
 import GuildConfigService from "../../services/GuildConfigService";
 import bot from "../../main";
