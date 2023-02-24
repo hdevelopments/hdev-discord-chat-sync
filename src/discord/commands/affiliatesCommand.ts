@@ -73,6 +73,23 @@ const affiliates = [
     image:
       "https://media.discordapp.net/attachments/1071103861483384904/1071111697336631378/GDS.png?width=1248&height=703",
   },
+  {
+    name: "Bot Hive",
+    description: `:bee: Welcome to Bot Hive – the ultimate network of bots! :robot:
+
+    Our team of developers have created a range of bots to cater to all your needs. From productivity bots to entertainment bots, our hive has got you covered.
+    
+    Visit our website at :globe_with_meridians: https://bothive.dev/ :globe_with_meridians: to learn more about our bots and how to get started. 
+    Join our hive today and experience the power of having multiple bots at your fingertips! :rocket:
+    
+    ╭─━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+    ┃ :computer: Visit our website at https://bothive.dev/                      |
+    ┃ :rocket: View a list of our bots at https://bothive.dev/bots    |
+    ╰─━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ╯`,
+    image:
+      "https://cdn.discordapp.com/attachments/1078658206903058512/1078664533834485840/1.png",
+    invite: "https://discord.gg/b3eExYpP5P",
+  },
 ];
 
 @Discord()
