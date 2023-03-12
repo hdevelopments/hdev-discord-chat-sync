@@ -41,16 +41,6 @@ const affiliates = [
       "https://cdn.discordapp.com/attachments/1067919780985720892/1068157417612902471/image.png",
   },
   {
-    name: "BytesToBits",
-    description: `BytesToBits is a community for developers, providing people with like-minded people to chat and have fun with!
-
-  🔗 Check us out:
-          => 🌐 Website: https://bytestobits.dev/`,
-    invite: " https://bytestobits.dev/discord",
-    image:
-      "https://cdn.discordapp.com/attachments/816811551079923763/982460251506880552/BytesToBitsBanner.png",
-  },
-  {
     name: "Game Dev Space",
     description: `**Welcome to Game Dev Space  A Community for Game Developers and Unity who are Passionate in Games**
     ╔═══════════════════════════
@@ -90,6 +80,23 @@ const affiliates = [
       "https://cdn.discordapp.com/attachments/1078658206903058512/1078664533834485840/1.png",
     invite: "https://discord.gg/b3eExYpP5P",
   },
+  {
+    name: "Sheriff Bumpy",
+    description: `The Bump Bot on your Side. I help you boosting your server.`,
+    image:
+      "https://cdn.discordapp.com/attachments/1084072532111527986/1084094911302877234/Sheriff_Bumpy.png",
+    invite: "https://discord.gg/TePFzavEBs",
+  },
+  {
+    name: "BytesToBits",
+    description: `BytesToBits is a community for developers, providing people with like-minded people to chat and have fun with!
+
+  🔗 Check us out:
+          => 🌐 Website: https://bytestobits.dev/`,
+    invite: "https://bytestobits.dev/discord",
+    image:
+      "https://cdn.discordapp.com/attachments/816811551079923763/982460251506880552/BytesToBitsBanner.png",
+  },
 ];
 
 @Discord()
@@ -100,7 +107,7 @@ class affiliatesCommand {
   async affiliates(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
     await interaction.editReply("Here are my Affiliates:");
-    affiliates.forEach(async (x) => {
+    affiliates.forEach(async (x, i) => {
       var embed = new EmbedBuilder();
       embed.setTitle(x.name);
       embed.setDescription(x.description);
@@ -115,11 +122,13 @@ class affiliatesCommand {
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           affiliateBtn
         );
-      await interaction.followUp({
-        embeds: [embed],
-        components: [row],
-        ephemeral: true,
-      });
+      setTimeout(async () => {
+        await interaction.followUp({
+          embeds: [embed],
+          components: [row],
+          ephemeral: true,
+        });
+      }, 1000 * i);
     });
   }
 }
