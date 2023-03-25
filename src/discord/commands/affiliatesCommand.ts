@@ -81,13 +81,6 @@ const affiliates = [
     invite: "https://discord.gg/b3eExYpP5P",
   },
   {
-    name: "Sheriff Bumpy",
-    description: `The Bump Bot on your Side. I help you boosting your server.`,
-    image:
-      "https://cdn.discordapp.com/attachments/1084072532111527986/1084094911302877234/Sheriff_Bumpy.png",
-    invite: "https://discord.gg/TePFzavEBs",
-  },
-  {
     name: "BytesToBits",
     description: `BytesToBits is a community for developers, providing people with like-minded people to chat and have fun with!
 
