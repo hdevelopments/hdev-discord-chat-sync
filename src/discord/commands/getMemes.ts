@@ -231,7 +231,7 @@ class getMemes {
     );
 
     var files = interaction.message.attachments.map(
-      (x) => new AttachmentBuilder(x.attachment)
+      (x) => new AttachmentBuilder(x.url)
     );
     var guildCfg = await this.guildConfigService.getOrCreate(
       interaction.guildId!

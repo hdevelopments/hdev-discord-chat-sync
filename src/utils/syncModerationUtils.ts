@@ -281,7 +281,7 @@ export default class syncUtils {
       guildEmbed.setDescription(text || null);
       var files = [
         ...message.attachments.map((val) => {
-          return new AttachmentBuilder(val.attachment, {
+          return new AttachmentBuilder(val.url, {
             description: val.description || undefined,
             name: val.name || undefined,
           });
